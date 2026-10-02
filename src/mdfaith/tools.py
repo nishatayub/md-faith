@@ -1,5 +1,6 @@
 """Tools exposed to the tool-using condition. They run real analysis on the (possibly artifact-containing)
 trajectory; the agent never sees ground-truth scalars or the artifact record."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -50,17 +51,33 @@ class Toolbox:
         _, ca = self._arrays()
         occ = G.contact_occupancy(ca)
         i, j = np.nonzero(np.triu(occ, 1) >= min_occupancy)
-        return {"n_pairs": int(len(i)), "pairs_residue_index": [[int(a), int(b)] for a, b in zip(i[:200], j[:200])]}
+        return {
+            "n_pairs": len(i),
+            "pairs_residue_index": [[int(a), int(b)] for a, b in zip(i[:200], j[:200], strict=True)],
+        }
 
     SPECS = [
-        {"name": "rmsd", "description": "Backbone RMSD per frame to a reference frame (Angstrom).",
-         "parameters": {"ref_frame": "int", "superpose": "bool"}},
+        {
+            "name": "rmsd",
+            "description": "Backbone RMSD per frame to a reference frame (Angstrom).",
+            "parameters": {"ref_frame": "int", "superpose": "bool"},
+        },
         {"name": "rmsf", "description": "CA RMSF per residue after fitting (Angstrom).", "parameters": {}},
-        {"name": "radius_of_gyration", "description": "Protein radius of gyration per frame.", "parameters": {}},
-        {"name": "frame_to_frame_rmsd", "description": "RMSD between consecutive frames; flags discontinuities.",
-         "parameters": {}},
-        {"name": "contacts", "description": "CA-CA contacts persistent above an occupancy threshold.",
-         "parameters": {"min_occupancy": "float"}},
+        {
+            "name": "radius_of_gyration",
+            "description": "Protein radius of gyration per frame.",
+            "parameters": {},
+        },
+        {
+            "name": "frame_to_frame_rmsd",
+            "description": "RMSD between consecutive frames; flags discontinuities.",
+            "parameters": {},
+        },
+        {
+            "name": "contacts",
+            "description": "CA-CA contacts persistent above an occupancy threshold.",
+            "parameters": {"min_occupancy": "float"},
+        },
     ]
 
     def call(self, name: str, arguments: dict | None = None) -> dict:

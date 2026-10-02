@@ -40,7 +40,7 @@ def test_pbc_split_creates_rmsd_spike_in_affected_frames(u, gt):
     assert rec.frames == [30, 31]
     assert g2.rmsd[30] > 5 * max(gt.rmsd[30], 1.0)
     assert g2.scalars["rmsd_max_frame"] in (30, 31)
-    assert g2.rmsd[10] == pytest.approx(gt.rmsd[10], abs=1e-3)   # untouched frames unchanged
+    assert g2.rmsd[10] == pytest.approx(gt.rmsd[10], abs=1e-3)  # untouched frames unchanged
 
 
 def test_shuffle_preserves_distributional_stats_but_not_order(u, gt):
@@ -80,10 +80,18 @@ def test_verify_ranking(gt):
 def test_verify_temporal_flags_artifact_misread(u):
     u2, rec = artifacts.pbc_split(u, frames=[30, 31], resid_range=(1, 60))
     g2 = groundtruth.compute(u2)
-    physical = Claim("a", "large conformational change at frame 30", Kind.TEMPORAL,
-                     {"event": "rmsd_peak", "frame": 30, "physical": True})
-    flagged = Claim("b", "RMSD spike at frame 30 is a wrapping artifact", Kind.TEMPORAL,
-                    {"event": "rmsd_peak", "frame": 30, "physical": False})
+    physical = Claim(
+        "a",
+        "large conformational change at frame 30",
+        Kind.TEMPORAL,
+        {"event": "rmsd_peak", "frame": 30, "physical": True},
+    )
+    flagged = Claim(
+        "b",
+        "RMSD spike at frame 30 is a wrapping artifact",
+        Kind.TEMPORAL,
+        {"event": "rmsd_peak", "frame": 30, "physical": False},
+    )
     assert verify(physical, g2, rec).label is Label.ARTIFACT_MISREAD
     assert verify(flagged, g2, rec).label is Label.SUPPORTED
 
@@ -101,14 +109,21 @@ def test_verify_causal(gt):
 
 
 def test_claims_from_json_drops_malformed():
-    s = ('[{"id":"1","text":"t","kind":"numeric","payload":{}},'
-         '{"id":"2","text":"t","kind":"bogus","payload":{}}, {"nope":1}]')
+    s = (
+        '[{"id":"1","text":"t","kind":"numeric","payload":{}},'
+        '{"id":"2","text":"t","kind":"bogus","payload":{}}, {"nope":1}]'
+    )
     assert [c.id for c in claims_from_json(s)] == ["1"]
 
 
 def test_metrics_and_bootstrap():
     from mdfaith.claims import Verdict
-    v1 = [Verdict("a", Label.SUPPORTED), Verdict("b", Label.CONTRADICTED), Verdict("c", Label.UNSUPPORTED_MECHANISM)]
+
+    v1 = [
+        Verdict("a", Label.SUPPORTED),
+        Verdict("b", Label.CONTRADICTED),
+        Verdict("c", Label.UNSUPPORTED_MECHANISM),
+    ]
     v2 = [Verdict("a", Label.SUPPORTED), Verdict("b", Label.SUPPORTED)]
     c1, c2 = metrics.counts(v1), metrics.counts(v2)
     assert c1["checkable"] == 2 and metrics.hallucination_rate(c1) == 0.5
@@ -118,6 +133,7 @@ def test_metrics_and_bootstrap():
 
 def test_rmsd_matches_mdanalysis_reference_implementation(u, gt):
     from MDAnalysis.analysis import rms
+
     ref = rms.RMSD(u, select="backbone", ref_frame=0).run().results.rmsd[:, 2]
     assert np.allclose(gt.rmsd, ref, atol=1e-3)
 
@@ -125,8 +141,10 @@ def test_rmsd_matches_mdanalysis_reference_implementation(u, gt):
 def test_rmsf_matches_mdanalysis_on_fitted_trajectory(u, gt):
     import MDAnalysis as mda
     from MDAnalysis.analysis import align, rms
+
     u2 = mda.Merge(u.atoms)
     from MDAnalysis.coordinates.memory import MemoryReader
+
     u2.load_new(groundtruth.frames_of(u, "all").astype(np.float32), format=MemoryReader, order="fac")
     align.AlignTraj(u2, u2, select="backbone", ref_frame=0, in_memory=True).run()
     ref = rms.RMSF(u2.select_atoms("protein and name CA")).run().results.rmsf

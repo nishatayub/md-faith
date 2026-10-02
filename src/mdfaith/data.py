@@ -1,4 +1,5 @@
 """Public systems only. Unpublished lab trajectories must not be added without the owner's written permission."""
+
 from __future__ import annotations
 
 import MDAnalysis as mda

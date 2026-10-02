@@ -1,5 +1,6 @@
 """Provider-agnostic LLM interface. Real providers are adapters implementing `complete`; none is bundled so the
 repo has no network dependency and no keys. `ScriptedClient` makes every condition testable offline."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -9,7 +10,7 @@ from typing import Protocol
 @dataclass
 class Reply:
     text: str = ""
-    tool_calls: list = field(default_factory=list)   # [{"name": str, "arguments": dict}]
+    tool_calls: list = field(default_factory=list)  # [{"name": str, "arguments": dict}]
 
 
 class LLMClient(Protocol):

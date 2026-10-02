@@ -1,4 +1,5 @@
 """Programmatic verification of claims against ground truth. No LLM judge here."""
+
 from __future__ import annotations
 
 from .artifacts import ArtifactRecord
@@ -14,8 +15,11 @@ def _numeric(c: Claim, gt: GroundTruth) -> Verdict:
     truth, claimed = gt.scalars[q], float(p["value"])
     tol = max(float(p.get("abs_tol", 0.0)), float(p.get("rel_tol", 0.10)) * abs(truth))
     ok = abs(claimed - truth) <= tol
-    return Verdict(c.id, Label.SUPPORTED if ok else Label.CONTRADICTED,
-                   f"{q}: claimed {claimed:.3g}, computed {truth:.3g}, tolerance {tol:.3g}")
+    return Verdict(
+        c.id,
+        Label.SUPPORTED if ok else Label.CONTRADICTED,
+        f"{q}: claimed {claimed:.3g}, computed {truth:.3g}, tolerance {tol:.3g}",
+    )
 
 
 def _ranking(c: Claim, gt: GroundTruth) -> Verdict:
@@ -29,8 +33,11 @@ def _ranking(c: Claim, gt: GroundTruth) -> Verdict:
     hits = sum(any(abs(r - t) <= window for t in truth) for r in residues)
     frac = hits / len(residues)
     need = float(p.get("min_hit_frac", 0.6))
-    return Verdict(c.id, Label.SUPPORTED if frac >= need else Label.CONTRADICTED,
-                   f"{hits}/{len(residues)} claimed residues in computed top-{k} {truth} (need {need:.0%}, window {window})")
+    return Verdict(
+        c.id,
+        Label.SUPPORTED if frac >= need else Label.CONTRADICTED,
+        f"{hits}/{len(residues)} claimed residues in computed top-{k} {truth} (need {need:.0%}, window {window})",
+    )
 
 
 def _temporal(c: Claim, gt: GroundTruth, art: ArtifactRecord | None) -> Verdict:
@@ -41,15 +48,24 @@ def _temporal(c: Claim, gt: GroundTruth, art: ArtifactRecord | None) -> Verdict:
     window = int(p.get("window", 5))
     if art is not None and art.kind != "none" and p.get("physical", True):
         if art.kind == "shuffle_frames":
-            return Verdict(c.id, Label.ARTIFACT_MISREAD,
-                           "time-ordered claim on a trajectory whose frame order was shuffled")
+            return Verdict(
+                c.id,
+                Label.ARTIFACT_MISREAD,
+                "time-ordered claim on a trajectory whose frame order was shuffled",
+            )
         if any(abs(int(frame) - f) <= window for f in art.frames):
-            return Verdict(c.id, Label.ARTIFACT_MISREAD,
-                           f"claimed event at frame {frame} lies in artifact frames ({art.description})")
+            return Verdict(
+                c.id,
+                Label.ARTIFACT_MISREAD,
+                f"claimed event at frame {frame} lies in artifact frames ({art.description})",
+            )
     truth = gt.scalars["rmsd_max_frame" if event == "rmsd_peak" else "rmsd_plateau_frame"]
     ok = abs(int(frame) - truth) <= window
-    return Verdict(c.id, Label.SUPPORTED if ok else Label.CONTRADICTED,
-                   f"{event}: claimed frame {frame}, computed {truth}, window {window}")
+    return Verdict(
+        c.id,
+        Label.SUPPORTED if ok else Label.CONTRADICTED,
+        f"{event}: claimed frame {frame}, computed {truth}, window {window}",
+    )
 
 
 def _causal(c: Claim) -> Verdict:

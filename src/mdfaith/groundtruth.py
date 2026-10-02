@@ -5,6 +5,7 @@ claims are scored against the same numbers regardless of which condition produce
 
 Units: Angstrom. Frames are 0-indexed trajectory frames (time axes are not trusted).
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -12,11 +13,11 @@ from dataclasses import dataclass, field
 import numpy as np
 from scipy.spatial.distance import cdist
 
-CONTACT_CUTOFF = 8.0       # CA-CA, Angstrom
-CONTACT_MIN_SEP = 4        # ignore |i-j| < 4 residues
-POLAR_CUTOFF = 3.5         # heavy-atom N/O distance, Angstrom (not a full H-bond criterion; see DESIGN.md)
+CONTACT_CUTOFF = 8.0  # CA-CA, Angstrom
+CONTACT_MIN_SEP = 4  # ignore |i-j| < 4 residues
+POLAR_CUTOFF = 3.5  # heavy-atom N/O distance, Angstrom (not a full H-bond criterion; see DESIGN.md)
 POLAR_MIN_SEP = 3
-PLATEAU_REL_TOL = 0.15     # RMSD stays within 15% of its own later mean
+PLATEAU_REL_TOL = 0.15  # RMSD stays within 15% of its own later mean
 
 
 def frames_of(u, selection: str) -> np.ndarray:
@@ -111,9 +112,15 @@ class GroundTruth:
     scalars: dict = field(default_factory=dict)
 
     def to_dict(self, include_matrices: bool = False) -> dict:
-        d = {"system": self.system, "n_frames": self.n_frames, "resids": list(map(int, self.resids)),
-             "rmsd": self.rmsd.tolist(), "rmsf": self.rmsf.tolist(), "rg": self.rg.tolist(),
-             "scalars": self.scalars}
+        d = {
+            "system": self.system,
+            "n_frames": self.n_frames,
+            "resids": list(map(int, self.resids)),
+            "rmsd": self.rmsd.tolist(),
+            "rmsf": self.rmsf.tolist(),
+            "rg": self.rg.tolist(),
+            "scalars": self.scalars,
+        }
         if include_matrices:
             d["contacts"] = self.contacts.tolist()
             d["polar"] = self.polar.tolist()
@@ -146,11 +153,16 @@ def compute(u, system: str = "unknown") -> GroundTruth:
     polar = polar_occupancy(polar_pos, res_index, n_res)
 
     s = {
-        "rmsd_mean": float(rmsd.mean()), "rmsd_max": float(rmsd.max()), "rmsd_final": float(rmsd[-1]),
-        "rmsd_max_frame": int(rmsd.argmax()), "rmsd_plateau_frame": int(plateau_frame(rmsd)),
-        "rmsf_mean": float(rmsf.mean()), "rmsf_max": float(rmsf.max()),
+        "rmsd_mean": float(rmsd.mean()),
+        "rmsd_max": float(rmsd.max()),
+        "rmsd_final": float(rmsd[-1]),
+        "rmsd_max_frame": int(rmsd.argmax()),
+        "rmsd_plateau_frame": int(plateau_frame(rmsd)),
+        "rmsf_mean": float(rmsf.mean()),
+        "rmsf_max": float(rmsf.max()),
         "rmsf_max_resid": int(resids[int(rmsf.argmax())]),
-        "rg_mean": float(rg.mean()), "rg_std": float(rg.std()),
+        "rg_mean": float(rg.mean()),
+        "rg_std": float(rg.std()),
         "contacts_persistent_n": int((np.triu(contacts, 1) > 0.9).sum()),
         "polar_persistent_n": int((np.triu(polar, 1) > 0.5).sum()),
     }

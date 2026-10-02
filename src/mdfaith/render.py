@@ -1,4 +1,5 @@
 """Plots and text tables shown to the image-only and table-only conditions."""
+
 from __future__ import annotations
 
 import io
@@ -6,10 +7,9 @@ import io
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-import numpy as np  # noqa: E402
+import matplotlib.pyplot as plt
 
-from .groundtruth import GroundTruth  # noqa: E402
+from .groundtruth import GroundTruth
 
 
 def _png(fig) -> bytes:
@@ -22,12 +22,18 @@ def _png(fig) -> bytes:
 def plots(gt: GroundTruth) -> list:
     """RMSD vs frame, RMSF vs residue, contact-occupancy map. Axes are labelled; no ground-truth annotations."""
     f1, a = plt.subplots(figsize=(6, 3))
-    a.plot(gt.rmsd); a.set_xlabel("frame"); a.set_ylabel("backbone RMSD (A)")
+    a.plot(gt.rmsd)
+    a.set_xlabel("frame")
+    a.set_ylabel("backbone RMSD (A)")
     f2, a = plt.subplots(figsize=(6, 3))
-    a.plot(gt.resids, gt.rmsf); a.set_xlabel("residue"); a.set_ylabel("CA RMSF (A)")
+    a.plot(gt.resids, gt.rmsf)
+    a.set_xlabel("residue")
+    a.set_ylabel("CA RMSF (A)")
     f3, a = plt.subplots(figsize=(4.5, 4))
     im = a.imshow(gt.contacts, origin="lower", cmap="viridis", vmin=0, vmax=1)
-    a.set_xlabel("residue index"); a.set_ylabel("residue index"); f3.colorbar(im, label="contact occupancy")
+    a.set_xlabel("residue index")
+    a.set_ylabel("residue index")
+    f3.colorbar(im, label="contact occupancy")
     return [_png(f1), _png(f2), _png(f3)]
 
 

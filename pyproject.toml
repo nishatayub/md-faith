@@ -18,7 +18,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "MDAnalysisTests"]
+dev = ["pytest", "pytest-cov", "ruff", "MDAnalysisTests", "httpx"]
+api = ["fastapi", "uvicorn[standard]"]
+llm = ["anthropic"]
 
 [project.scripts]
 mdfaith = "mdfaith.cli:main"
@@ -29,3 +31,12 @@ where = ["src"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "RUF"]
+ignore = ["E501", "E741", "RUF012", "RUF001", "RUF002", "RUF003"]

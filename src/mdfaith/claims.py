@@ -1,4 +1,5 @@
 """Atomic-claim schema. An explanation is split into claims; each claim is checked on its own."""
+
 from __future__ import annotations
 
 import json
@@ -7,18 +8,18 @@ from enum import Enum
 
 
 class Kind(str, Enum):
-    NUMERIC = "numeric"      # a value of a scalar quantity
-    RANKING = "ranking"      # which residues are highest / lowest in a per-residue quantity
-    TEMPORAL = "temporal"    # when something happens (frame index)
-    CAUSAL = "causal"        # a mechanistic or causal statement; not checkable from the trajectory alone
+    NUMERIC = "numeric"  # a value of a scalar quantity
+    RANKING = "ranking"  # which residues are highest / lowest in a per-residue quantity
+    TEMPORAL = "temporal"  # when something happens (frame index)
+    CAUSAL = "causal"  # a mechanistic or causal statement; not checkable from the trajectory alone
 
 
 class Label(str, Enum):
     SUPPORTED = "supported"
-    CONTRADICTED = "contradicted"                  # checkable and wrong
-    ARTIFACT_MISREAD = "artifact_misread"          # artifact frames presented as a physical event
+    CONTRADICTED = "contradicted"  # checkable and wrong
+    ARTIFACT_MISREAD = "artifact_misread"  # artifact frames presented as a physical event
     UNSUPPORTED_MECHANISM = "unsupported_mechanism"  # causal claim with no cited evidence
-    UNVERIFIABLE = "unverifiable"                  # cannot be checked (unknown quantity, or needs a human)
+    UNVERIFIABLE = "unverifiable"  # cannot be checked (unknown quantity, or needs a human)
 
 
 @dataclass
