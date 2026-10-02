@@ -1,0 +1,22 @@
+# MD-Faith default experiment configuration (provisional; see docs/DESIGN.md)
+systems:
+  - adk_dims            # public AdK trajectory bundled with MDAnalysisTests (98 frames)
+  # add public systems here, e.g. an MDAnalysisData trajectory; do NOT add unpublished lab data
+  # without written permission from the data owner
+
+analyses: [rmsd, rmsf, rg, contacts, polar_contacts]
+
+artifacts:
+  - {kind: none}
+  - {kind: pbc_split, frames: [30, 31, 32], resid_range: [1, 60], box_len: 80.0}
+  - {kind: shuffle_frames, seed: 0}
+  - {kind: rigid_jitter, max_shift: 30.0, seed: 0}
+
+conditions: [image_only, table_only, tool_agent, tool_agent_verified]
+
+models:             # fill in; never commit API keys
+  - {name: placeholder-model-a}
+  - {name: placeholder-model-b}
+
+seeds: [0, 1, 2]
+bootstrap: {n: 2000, seed: 0}
