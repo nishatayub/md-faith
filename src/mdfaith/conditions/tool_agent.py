@@ -36,10 +36,19 @@ class ToolAgent(Condition):
             n += 1
             if not reply.tool_calls:
                 return Explanation(reply.text, calls, n)
-            msgs.append({"role": "assistant", "content": reply.text or json.dumps(reply.tool_calls)})
+            for i, tc in enumerate(reply.tool_calls):
+                tc.setdefault("id", f"call_{n}_{i}")
+            msgs.append(
+                {
+                    "role": "assistant",
+                    "content": reply.text or json.dumps(reply.tool_calls),
+                    "tool_calls": reply.tool_calls,
+                    "raw": reply.raw,
+                }
+            )
             for tc in reply.tool_calls:
                 out = box.call(tc["name"], tc.get("arguments"))
                 calls.append({"name": tc["name"], "arguments": tc.get("arguments", {})})
-                msgs.append({"role": "tool", "content": json.dumps(out)[:20000]})
+                msgs.append({"role": "tool", "tool_call_id": tc["id"], "content": json.dumps(out)[:20000]})
         final = self.client.complete([*msgs, {"role": "user", "content": "Give your final explanation now."}])
         return Explanation(final.text, calls, n + 1)
