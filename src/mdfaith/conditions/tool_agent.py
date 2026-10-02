@@ -16,11 +16,19 @@ class ToolAgent(Condition):
         super().__init__(client)
         self.max_steps = max_steps
 
+    def preamble(self, task: Task) -> str:
+        """Extra context placed before the question. Empty for the plain tool agent."""
+        return ""
+
     def run(self, task: Task) -> Explanation:
         box = Toolbox(task.universe)
+        pre = self.preamble(task)
         msgs = [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": task.question + " Use the tools to compute what you need."},
+            {
+                "role": "user",
+                "content": (pre + "\n\n" if pre else "") + task.question + " Use the tools to compute what you need.",
+            },
         ]
         calls, n = [], 0
         for _ in range(self.max_steps):

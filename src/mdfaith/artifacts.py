@@ -97,3 +97,16 @@ def build(u, spec: dict):
     spec = dict(spec)
     kind = spec.pop("kind")
     return BUILDERS[kind](u, **spec)
+
+
+# Sensible defaults so an artifact can be requested by name alone (CLI, API, UI).
+DEFAULT_SPECS = {
+    "none": {"kind": "none"},
+    "pbc_split": {"kind": "pbc_split", "frames": [30, 31, 32], "resid_range": [1, 60], "box_len": 80.0},
+    "shuffle_frames": {"kind": "shuffle_frames", "seed": 0},
+    "rigid_jitter": {"kind": "rigid_jitter", "max_shift": 30.0, "seed": 0},
+}
+
+
+def build_default(u, kind: str):
+    return build(u, DEFAULT_SPECS[kind])
