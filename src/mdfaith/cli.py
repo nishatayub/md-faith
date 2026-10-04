@@ -80,6 +80,17 @@ def cmd_run(a) -> None:
     print(f"\nrun {rid} stored in {a.db}")
 
 
+def cmd_serve(a) -> None:
+    import os
+
+    try:
+        import uvicorn
+    except ImportError as e:  # pragma: no cover
+        raise SystemExit("serve needs the api extra: pip install -e '.[api]'") from e
+    os.environ["MDFAITH_DB"] = a.db
+    uvicorn.run("mdfaith.api:app_factory", factory=True, host=a.host, port=a.port, reload=a.reload)
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -136,6 +147,12 @@ def main(argv=None) -> None:
     r.add_argument("--name", default="cli run")
     r.add_argument("--db", default="results/mdfaith.db")
     r.set_defaults(fn=cmd_run)
+    sv = sub.add_parser("serve", help="start the web app and API")
+    sv.add_argument("--host", default="127.0.0.1")
+    sv.add_argument("--port", type=int, default=8000)
+    sv.add_argument("--db", default="results/mdfaith.db")
+    sv.add_argument("--reload", action="store_true")
+    sv.set_defaults(fn=cmd_serve)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
