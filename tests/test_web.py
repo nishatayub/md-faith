@@ -21,9 +21,15 @@ def test_app_shell_and_static_assets_are_served(client):
         assert a.status_code == 200 and kind in a.headers["content-type"]
 
 
-def test_root_serves_something_navigable(client):
-    r = client.get("/", follow_redirects=False)
-    assert r.status_code in (200, 307)
+def test_landing_site_is_served_at_root(client):
+    r = client.get("/")
+    assert r.status_code == 200 and "Check it." in r.text and "/app" in r.text
+    assert client.get("/site/site.css").status_code == 200
+
+
+def test_landing_site_labels_results_as_placeholders():
+    html = (WEB / "site" / "index.html").read_text()
+    assert html.count("PLACEHOLDER") >= 3 and "have not been run yet" in html
 
 
 def test_app_js_has_no_native_replace_children_with_nullable_args():
