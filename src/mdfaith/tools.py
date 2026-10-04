@@ -47,6 +47,16 @@ class Toolbox:
             out.append(round(float(np.sqrt(np.mean(np.sum((a - bb[t - 1]) ** 2, axis=1)))), 3))
         return {"per_frame": out}
 
+    def hbonds(self) -> dict:
+        """Hydrogen bonds (donor-acceptor < 3.0 A, angle > 150 deg): count per frame and persistent residue pairs."""
+        prot = self.u.select_atoms("protein")
+        res_pos = {int(r.resindex): i for i, r in enumerate(prot.residues)}
+        counts, occ = G.hbond_analysis(self.u, res_pos, len(prot.residues))
+        return {
+            "per_frame_count": [int(c) for c in counts],
+            "persistent_pairs_over_50pct": int((occ > 0.5).sum()),
+        }
+
     def contacts(self, min_occupancy: float = 0.9) -> dict:
         _, ca = self._arrays()
         occ = G.contact_occupancy(ca)
@@ -71,6 +81,11 @@ class Toolbox:
         {
             "name": "frame_to_frame_rmsd",
             "description": "RMSD between consecutive frames; flags discontinuities.",
+            "parameters": {},
+        },
+        {
+            "name": "hbonds",
+            "description": "Hydrogen bonds per frame and number of persistent residue pairs.",
             "parameters": {},
         },
         {

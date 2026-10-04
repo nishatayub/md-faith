@@ -17,6 +17,8 @@ CONTACT_CUTOFF = 8.0  # CA-CA, Angstrom
 CONTACT_MIN_SEP = 4  # ignore |i-j| < 4 residues
 POLAR_CUTOFF = 3.5  # heavy-atom N/O distance, Angstrom (not a full H-bond criterion; see DESIGN.md)
 POLAR_MIN_SEP = 3
+HBOND_D_A_CUTOFF = 3.0  # donor-acceptor distance, Angstrom
+HBOND_ANGLE_CUTOFF = 150.0  # donor-H-acceptor angle, degrees
 PLATEAU_REL_TOL = 0.15  # RMSD stays within 15% of its own later mean
 
 
@@ -99,6 +101,42 @@ def polar_occupancy(pos: np.ndarray, res_index: np.ndarray, n_res: int) -> np.nd
     return occ
 
 
+def hbond_analysis(u, res_pos: dict, n_res: int):
+    """Hydrogen bonds with distance and angle criteria (MDAnalysis HydrogenBondAnalysis).
+
+    Returns (per-frame bond count, directional residue-pair occupancy [donor residue, acceptor residue]).
+    Requires hydrogens and bonds in the topology; returns zeros (and a flag in scalars) if none are available.
+    """
+    from MDAnalysis.analysis.hydrogenbonds.hbond_analysis import HydrogenBondAnalysis
+
+    T = len(u.trajectory)
+    counts, occ = np.zeros(T), np.zeros((n_res, n_res))
+    if len(u.select_atoms("protein and name H*")) == 0:
+        return counts, occ
+    hba = HydrogenBondAnalysis(
+        universe=u,
+        hydrogens_sel="protein and name H*",
+        d_a_cutoff=HBOND_D_A_CUTOFF,
+        d_h_a_angle_cutoff=HBOND_ANGLE_CUTOFF,
+        update_selections=False,  # static topology; ~15x faster
+    )
+    hba.run()
+    hb = hba.results.hbonds
+    if len(hb) == 0:
+        return counts, occ
+    frames = hb[:, 0].astype(int)
+    counts = np.bincount(frames, minlength=T).astype(float)
+    don = u.atoms[hb[:, 1].astype(int)].resindices
+    acc = u.atoms[hb[:, 3].astype(int)].resindices
+    seen = set()
+    for f, d, a in zip(frames, don, acc, strict=True):
+        if d in res_pos and a in res_pos and d != a:
+            seen.add((int(f), res_pos[int(d)], res_pos[int(a)]))
+    for _, i, j in seen:
+        occ[i, j] += 1
+    return counts, occ / T
+
+
 @dataclass
 class GroundTruth:
     system: str
@@ -110,6 +148,8 @@ class GroundTruth:
     contacts: np.ndarray
     polar: np.ndarray
     scalars: dict = field(default_factory=dict)
+    hbond_counts: np.ndarray | None = None
+    hbond_occupancy: np.ndarray | None = None
 
     def to_dict(self, include_matrices: bool = False) -> dict:
         d = {
@@ -120,6 +160,7 @@ class GroundTruth:
             "rmsf": self.rmsf.tolist(),
             "rg": self.rg.tolist(),
             "scalars": self.scalars,
+            "hbond_counts": None if self.hbond_counts is None else self.hbond_counts.tolist(),
         }
         if include_matrices:
             d["contacts"] = self.contacts.tolist()
@@ -152,6 +193,8 @@ def compute(u, system: str = "unknown") -> GroundTruth:
     polar_pos = frames_of(u, "protein and (name N or name N* or name O or name O*)")
     polar = polar_occupancy(polar_pos, res_index, n_res)
 
+    hb_counts, hb_occ = hbond_analysis(u, {int(r.resindex): i for i, r in enumerate(prot.residues)}, n_res)
+
     s = {
         "rmsd_mean": float(rmsd.mean()),
         "rmsd_max": float(rmsd.max()),
@@ -165,5 +208,8 @@ def compute(u, system: str = "unknown") -> GroundTruth:
         "rg_std": float(rg.std()),
         "contacts_persistent_n": int((np.triu(contacts, 1) > 0.9).sum()),
         "polar_persistent_n": int((np.triu(polar, 1) > 0.5).sum()),
+        "hbond_mean_count": float(hb_counts.mean()),
+        "hbond_std_count": float(hb_counts.std()),
+        "hbond_persistent_n": int((hb_occ > 0.5).sum()),
     }
-    return GroundTruth(system, len(u.trajectory), resids, rmsd, rmsf, rg, contacts, polar, s)
+    return GroundTruth(system, len(u.trajectory), resids, rmsd, rmsf, rg, contacts, polar, s, hb_counts, hb_occ)

@@ -149,3 +149,24 @@ def test_rmsf_matches_mdanalysis_on_fitted_trajectory(u, gt):
     align.AlignTraj(u2, u2, select="backbone", ref_frame=0, in_memory=True).run()
     ref = rms.RMSF(u2.select_atoms("protein and name CA")).run().results.rmsf
     assert np.allclose(gt.rmsf, ref, atol=5e-2)
+
+
+def test_hbond_ground_truth_is_plausible(gt):
+    assert gt.hbond_counts is not None and len(gt.hbond_counts) == gt.n_frames
+    assert 60 < gt.scalars["hbond_mean_count"] < 200
+    assert gt.hbond_occupancy.shape == (214, 214) and gt.scalars["hbond_persistent_n"] > 20
+    assert (gt.hbond_occupancy.diagonal() == 0).all()
+
+
+def test_hbond_counts_drop_when_domain_is_wrapped(u, gt):
+    u2, rec = artifacts.build_default(u, "pbc_split")
+    g2 = groundtruth.compute(u2)
+    f = rec.frames[0]
+    assert g2.hbond_counts[f] < 0.9 * gt.hbond_counts[f]
+
+
+def test_hbond_tool(u):
+    from mdfaith.tools import Toolbox
+
+    out = Toolbox(u).hbonds()
+    assert len(out["per_frame_count"]) == len(u.trajectory) and out["persistent_pairs_over_50pct"] > 20

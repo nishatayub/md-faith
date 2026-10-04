@@ -12,7 +12,7 @@ EXTRACT_PROMPT = """Split the explanation below into atomic claims about a molec
 Return ONLY a JSON array following this schema: {schema}
 
 Kinds and payloads:
-- numeric: {{"quantity": one of rmsd_mean|rmsd_max|rmsd_final|rmsf_mean|rmsf_max|rg_mean|rg_std, "value": number}}
+- numeric: {{"quantity": one of rmsd_mean|rmsd_max|rmsd_final|rmsf_mean|rmsf_max|rg_mean|rg_std|hbond_mean_count, "value": number}}
 - ranking: {{"quantity": "rmsf", "direction": "highest"|"lowest", "k": int, "residues": [residue numbers]}}
 - temporal: {{"event": "rmsd_peak"|"rmsd_plateau", "frame": int, "physical": true|false}}
   (physical=false only if the text says the event is an artifact or processing problem)
