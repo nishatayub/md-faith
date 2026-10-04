@@ -91,6 +91,18 @@ def cmd_serve(a) -> None:
     uvicorn.run("mdfaith.api:app_factory", factory=True, host=a.host, port=a.port, reload=a.reload)
 
 
+def cmd_figures(a) -> None:
+    from .figures import make_figures
+    from .store import Store
+
+    store = Store(a.db)
+    run_id = a.run or (store.list_runs() or [{}])[0].get("id")
+    if not run_id:
+        raise SystemExit("no runs in the database; run `mdfaith demo` first")
+    for p in make_figures(store, run_id, a.out, with_trajectory=not a.no_trajectory):
+        print("wrote", p)
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -153,6 +165,12 @@ def main(argv=None) -> None:
     sv.add_argument("--db", default="results/mdfaith.db")
     sv.add_argument("--reload", action="store_true")
     sv.set_defaults(fn=cmd_serve)
+    f = sub.add_parser("figures", help="write figures and tables for a stored run")
+    f.add_argument("--db", default="results/mdfaith.db")
+    f.add_argument("--run", default=None, help="run id (default: most recent)")
+    f.add_argument("--out", default="docs/figures")
+    f.add_argument("--no-trajectory", action="store_true", help="skip the trajectory-based figure")
+    f.set_defaults(fn=cmd_figures)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
