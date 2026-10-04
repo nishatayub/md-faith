@@ -3,6 +3,7 @@
 The extractor is itself an LLM, so its output is validated (`claims_from_json` drops malformed items) and a random
 subset must be checked by hand before any result is reported (see docs/DESIGN.md, 'Validity threats').
 """
+
 from __future__ import annotations
 
 from .claims import CLAIM_JSON_SCHEMA, claims_from_json

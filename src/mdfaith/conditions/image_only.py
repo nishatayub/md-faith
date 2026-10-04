@@ -11,7 +11,12 @@ class ImageOnly(Condition):
 
     def run(self, task: Task) -> Explanation:
         images = render.plots(task.ground_truth)
-        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": task.question + " Three figures are attached: backbone RMSD vs frame, "
-                                            "CA RMSF vs residue, and a CA contact-occupancy map."}]
+        msgs = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {
+                "role": "user",
+                "content": task.question + " Three figures are attached: backbone RMSD vs frame, "
+                "CA RMSF vs residue, and a CA contact-occupancy map.",
+            },
+        ]
         return Explanation(self.client.complete(msgs, images=images).text)

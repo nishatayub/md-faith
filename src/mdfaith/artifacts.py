@@ -3,6 +3,7 @@
 Each generator returns (new_universe, ArtifactRecord). The record states which frames are affected, so the verifier
 can tell a claim about a real physical event from a misreading of an artifact.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -17,7 +18,7 @@ from .groundtruth import frames_of
 @dataclass
 class ArtifactRecord:
     kind: str
-    frames: list = field(default_factory=list)   # frames whose coordinates are artificial
+    frames: list = field(default_factory=list)  # frames whose coordinates are artificial
     params: dict = field(default_factory=dict)
     description: str = ""
 
@@ -41,8 +42,11 @@ def pbc_split(u, frames, resid_range, box_len: float = 80.0, axis: int = 0):
     for f in frames:
         pos[f, mask, axis] += box_len
     return _rebuild(u, pos), ArtifactRecord(
-        "pbc_split", list(frames), {"resid_range": [lo, hi], "box_len": box_len, "axis": axis},
-        f"residues {lo}-{hi} shifted by {box_len} A along axis {axis} in frames {list(frames)}")
+        "pbc_split",
+        list(frames),
+        {"resid_range": [lo, hi], "box_len": box_len, "axis": axis},
+        f"residues {lo}-{hi} shifted by {box_len} A along axis {axis} in frames {list(frames)}",
+    )
 
 
 def shuffle_frames(u, seed: int = 0):
@@ -50,8 +54,11 @@ def shuffle_frames(u, seed: int = 0):
     pos = frames_of(u, "all")
     perm = np.random.default_rng(seed).permutation(len(pos))
     return _rebuild(u, pos[perm]), ArtifactRecord(
-        "shuffle_frames", list(range(len(pos))), {"seed": seed, "perm": perm.tolist()},
-        "frame order randomly permuted")
+        "shuffle_frames",
+        list(range(len(pos))),
+        {"seed": seed, "perm": perm.tolist()},
+        "frame order randomly permuted",
+    )
 
 
 def _random_rotation(rng) -> np.ndarray:
@@ -71,11 +78,19 @@ def rigid_jitter(u, max_shift: float = 30.0, seed: int = 0):
         c = pos[t].mean(0)
         pos[t] = (pos[t] - c) @ _random_rotation(rng) + c + rng.uniform(-max_shift, max_shift, size=3)
     return _rebuild(u, pos), ArtifactRecord(
-        "rigid_jitter", list(range(len(pos))), {"max_shift": max_shift, "seed": seed},
-        "random rigid-body motion applied to every frame; trajectory is not fitted")
+        "rigid_jitter",
+        list(range(len(pos))),
+        {"max_shift": max_shift, "seed": seed},
+        "random rigid-body motion applied to every frame; trajectory is not fitted",
+    )
 
 
-BUILDERS = {"none": none, "pbc_split": pbc_split, "shuffle_frames": shuffle_frames, "rigid_jitter": rigid_jitter}
+BUILDERS = {
+    "none": none,
+    "pbc_split": pbc_split,
+    "shuffle_frames": shuffle_frames,
+    "rigid_jitter": rigid_jitter,
+}
 
 
 def build(u, spec: dict):

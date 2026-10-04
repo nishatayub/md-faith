@@ -18,8 +18,10 @@ class ToolAgent(Condition):
 
     def run(self, task: Task) -> Explanation:
         box = Toolbox(task.universe)
-        msgs = [{"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": task.question + " Use the tools to compute what you need."}]
+        msgs = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": task.question + " Use the tools to compute what you need."},
+        ]
         calls, n = [], 0
         for _ in range(self.max_steps):
             reply = self.client.complete(msgs, tools=Toolbox.SPECS)
@@ -31,5 +33,5 @@ class ToolAgent(Condition):
                 out = box.call(tc["name"], tc.get("arguments"))
                 calls.append({"name": tc["name"], "arguments": tc.get("arguments", {})})
                 msgs.append({"role": "tool", "content": json.dumps(out)[:20000]})
-        final = self.client.complete(msgs + [{"role": "user", "content": "Give your final explanation now."}])
+        final = self.client.complete([*msgs, {"role": "user", "content": "Give your final explanation now."}])
         return Explanation(final.text, calls, n + 1)

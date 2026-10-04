@@ -1,4 +1,5 @@
 """Claim-level metrics with task-clustered bootstrap intervals (claims within a task are not independent)."""
+
 from __future__ import annotations
 
 import numpy as np

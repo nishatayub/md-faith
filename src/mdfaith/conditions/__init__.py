@@ -5,4 +5,4 @@ from .tool_agent import ToolAgent
 
 CONDITIONS = {"image_only": ImageOnly, "table_only": TableOnly, "tool_agent": ToolAgent}
 
-__all__ = ["Condition", "Explanation", "Task", "ImageOnly", "TableOnly", "ToolAgent", "CONDITIONS"]
+__all__ = ["CONDITIONS", "Condition", "Explanation", "ImageOnly", "TableOnly", "Task", "ToolAgent"]

@@ -17,7 +17,7 @@ SYSTEM_PROMPT = (
 class Task:
     task_id: str
     system: str
-    universe: object          # the (possibly artifact-containing) MDAnalysis Universe
+    universe: object  # the (possibly artifact-containing) MDAnalysis Universe
     ground_truth: GroundTruth
     artifact: ArtifactRecord
     question: str = "Summarise the stability and flexibility of this protein over the trajectory."
