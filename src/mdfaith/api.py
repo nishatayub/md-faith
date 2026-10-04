@@ -355,6 +355,12 @@ def create_app(db_path: str = "results/mdfaith.db", web_dir: str | Path | None =
         app.mount("/app/static", StaticFiles(directory=web / "app"), name="app-static")
         if (web / "assets").exists():
             app.mount("/assets", StaticFiles(directory=web / "assets"), name="assets")
+        if not (web / "site" / "index.html").exists():
+
+            @app.get("/", include_in_schema=False)
+            def root_redirect():
+                return RedirectResponse("/app")
+
         if (web / "site" / "index.html").exists():
 
             @app.get("/", include_in_schema=False)

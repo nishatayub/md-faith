@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MD-Faith · fact-check AI explanations of molecular dynamics</title>
+  <meta name="description" content="Check AI-written explanations of MD trajectories against computed ground truth.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232a78d6'/%3E%3Cpath d='M8 17l5 5 11-12' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/app/static/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="MD-Faith home">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M8 17l5 5 11-12" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      MD-Faith
+    </a>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#/" data-r="home">Overview</a>
+      <a href="#/lab" data-r="lab">Trajectory lab</a>
+      <a href="#/verify" data-r="verify">Fact-check</a>
+      <a href="#/runs" data-r="runs">Runs</a>
+      <a href="#/results" data-r="results">Results</a>
+      <a href="#/about" data-r="about">Methods</a>
+    </nav>
+    <button class="btn btn-ghost btn-sm" id="theme" type="button" aria-label="Toggle colour theme">Theme</button>
+    <a class="btn btn-ghost btn-sm" href="/" style="text-decoration:none">Website</a>
+  </header>
+  <main id="view" tabindex="-1"><div class="empty"><span class="spinner"></span> Loading…</div></main>
+  <footer>MD-Faith · evaluation harness for AI explanations of molecular dynamics · <a href="https://github.com/nishatayub/md-faith">GitHub</a> · <a href="/docs">API docs</a></footer>
+  <div id="modal-root"></div>
+  <script type="module" src="/app/static/app.js"></script>
+</body>
+</html>
