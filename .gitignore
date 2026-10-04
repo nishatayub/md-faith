@@ -9,3 +9,8 @@ data/raw/
 *.xtc
 *.trr
 .DS_Store
+
+# build artifacts
+build/
+dist/
+*.egg-info/

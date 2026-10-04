@@ -1,0 +1,12 @@
+services:
+  mdfaith:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - mdfaith-data:/data
+    environment:
+      # Real-model runs stay disabled unless you opt in; they spend API credit.
+      MDFAITH_ALLOW_REAL: "0"
+volumes:
+  mdfaith-data:

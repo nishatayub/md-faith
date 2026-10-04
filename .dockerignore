@@ -1,0 +1,8 @@
+.git
+.venv
+results
+docs/figures
+**/__pycache__
+.pytest_cache
+.ruff_cache
+_amr_shift_scratch
