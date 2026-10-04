@@ -33,3 +33,14 @@ def extract_claims(client, explanation_text: str) -> list:
         return claims_from_json(raw)
     except ValueError:
         return []
+
+
+class LLMExtractor:
+    """Adapter giving an `LLMClient` the same `.extract(text)` interface as `extract_rules.RuleExtractor`."""
+
+    def __init__(self, client):
+        self.client = client
+        self.name = f"llm:{getattr(client, 'name', 'unknown')}"
+
+    def extract(self, text: str) -> list:
+        return extract_claims(self.client, text)
