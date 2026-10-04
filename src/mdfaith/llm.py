@@ -10,7 +10,8 @@ from typing import Protocol
 @dataclass
 class Reply:
     text: str = ""
-    tool_calls: list = field(default_factory=list)  # [{"name": str, "arguments": dict}]
+    tool_calls: list = field(default_factory=list)  # [{"id": str, "name": str, "arguments": dict}]
+    raw: object = None  # provider-specific content (e.g. thinking blocks) to echo back unchanged in tool loops
 
 
 class LLMClient(Protocol):
