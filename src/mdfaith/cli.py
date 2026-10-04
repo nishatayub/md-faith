@@ -27,6 +27,16 @@ def cmd_groundtruth(a) -> None:
     print(json.dumps(gt.scalars, indent=2))
 
 
+def cmd_qc(a) -> None:
+    from . import artifacts
+    from .qc import run_qc
+
+    u, rec = artifacts.build_default(load_system(a.system), a.artifact)
+    rep = run_qc(u)
+    print(f"artifact={rec.kind}  passed={rep.passed}")
+    print(rep.to_prompt())
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -65,6 +75,10 @@ def main(argv=None) -> None:
     g.add_argument("--system", default="adk_dims")
     g.add_argument("--out", default="results/groundtruth.json")
     g.set_defaults(fn=cmd_groundtruth)
+    q = sub.add_parser("qc", help="run trajectory QC on a system, optionally with a planted artifact")
+    q.add_argument("--system", default="adk_dims")
+    q.add_argument("--artifact", default="none", choices=["none", "pbc_split", "shuffle_frames", "rigid_jitter"])
+    q.set_defaults(fn=cmd_qc)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
