@@ -10,6 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "MDAnalysis>=2.7",
+    "MDAnalysisTests",  # supplies the bundled public AdK trajectory used by the demo
     "numpy",
     "scipy",
     "pandas",
@@ -18,7 +19,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "pytest-cov", "ruff", "MDAnalysisTests", "httpx"]
+dev = ["pytest", "pytest-cov", "ruff", "httpx"]
 api = ["fastapi", "uvicorn[standard]"]
 llm = ["anthropic"]
 
