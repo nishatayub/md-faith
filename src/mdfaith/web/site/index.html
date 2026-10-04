@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MD-Faith · Check AI explanations of molecular dynamics against the trajectory</title>
+  <meta name="description" content="MD-Faith computes ground truth from MD trajectories, plants known processing problems and verifies every claim an AI makes. An evaluation harness and fact-checker.">
+  <meta property="og:title" content="MD-Faith: fact-check AI explanations of molecular dynamics">
+  <meta property="og:description" content="Ground truth, planted traps and claim-level verification for AI-written MD analyses.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232a78d6'/%3E%3Cpath d='M8 17l5 5 11-12' stroke='white' stroke-width='3.4' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/site/site.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top" aria-label="MD-Faith">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="var(--accent)"/><path d="M8 17l5 5 11-12" stroke="#fff" stroke-width="3.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      MD-Faith
+    </a>
+    <nav aria-label="Sections">
+      <a href="#problem">Problem</a>
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#results">Results</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="https://github.com/nishatayub/md-faith">GitHub</a>
+    </nav>
+    <a class="btn" href="/app">Open the app</a>
+  </header>
+
+  <main id="top">
+    <section class="hero wrap">
+      <div>
+        <p class="eyebrow">Evaluation harness · fact-checker</p>
+        <h1>Don't trust an AI's reading of your MD run. <span>Check it.</span></h1>
+        <p class="lead">LLMs now explain molecular dynamics analyses, and they sound confident whether or not they are right. MD-Faith computes ground truth from the trajectory, plants known processing problems, and checks every claim against the numbers, with code rather than another model's opinion.</p>
+        <div class="cta">
+          <a class="btn btn-lg" href="/app#/verify">Fact-check an explanation</a>
+          <a class="btn btn-lg btn-ghost" href="/app#/lab">Explore trajectories</a>
+        </div>
+        <p class="fine">Open source · MIT · runs locally · public data only</p>
+      </div>
+      <figure class="mock" aria-label="Example of an annotated report">
+        <figcaption>Example report <em>(illustrative)</em></figcaption>
+        <div class="s ok"><b>✓ Supported</b> The mean backbone RMSD is 4.3 Å.</div>
+        <div class="s bad"><b>✕ Contradicted</b> Residues 1, 2 and 3 show the highest RMSF.<small>Computed top residues: 149, 150, 151</small></div>
+        <div class="s art"><b>⚠ Artifact misread</b> RMSD peaks at frame 30, indicating a large conformational change.<small>Frames 30–32 are a periodic-boundary wrapping artifact.</small></div>
+        <div class="s uns"><b>? Unsupported claim</b> This is caused by hinge motion between the lid and core domains.</div>
+      </figure>
+    </section>
+
+    <section id="problem" class="wrap">
+      <h2>Three ways an AI explanation goes wrong</h2>
+      <div class="cards">
+        <article><h3>Plausible but wrong numbers</h3><p>Values read off a plot, rounded aggressively or invented. A sentence like "mean RMSD is about 2 Å" is easy to write and hard to notice when it is really 4.4 Å.</p></article>
+        <article><h3>Artifacts read as physics</h3><p>A domain wrapped across the periodic boundary makes RMSD spike. An explanation that reports a "large conformational change" has explained a processing error.</p></article>
+        <article><h3>Mechanisms nobody measured</h3><p>"Caused by hinge motion" sounds expert. Nothing in an RMSD curve establishes a mechanism, so such claims are flagged unless they cite computed evidence.</p></article>
+      </div>
+    </section>
+
+    <section id="how" class="wrap">
+      <h2>How it works</h2>
+      <p class="sub">Every verdict is computed from coordinates. No LLM decides what is true.</p>
+      <ol class="pipeline">
+        <li><b>Trajectory</b><span>Public systems only</span></li>
+        <li><b>QC gate</b><span>Wrapping, fitting, frame order</span></li>
+        <li><b>Ground truth</b><span>RMSD, RMSF, Rg, contacts, H-bonds</span></li>
+        <li><b>AI explanation</b><span>Plot, table or tool agent</span></li>
+        <li><b>Claim extraction</b><span>Numeric, ranking, temporal, causal</span></li>
+        <li><b>Verifier</b><span>Tolerance-based, in code</span></li>
+        <li class="end"><b>Evidence report</b><span>Per-sentence verdict and proof</span></li>
+      </ol>
+    </section>
+
+    <section id="features" class="wrap">
+      <h2>What's inside</h2>
+      <div class="cards four">
+        <article><h3>Trajectory QC</h3><p>Detects broken backbones, frame discontinuities, unfitted frames and scrambled order before anyone interprets the data.</p></article>
+        <article><h3>Ground truth</h3><p>RMSD, RMSF, radius of gyration, contacts and distance-and-angle hydrogen bonds, cross-checked against MDAnalysis.</p></article>
+        <article><h3>Planted traps</h3><p>Wrapped domains, shuffled frames and unfitted trajectories with known consequences, so you can test whether an AI notices.</p></article>
+        <article><h3>Claim verifier</h3><p>Numeric, ranking, temporal and causal claims, each with explicit tolerances and its own verdict label.</p></article>
+        <article><h3>Evidence-linked reports</h3><p>Every sentence tagged, with the computed value, the tool that reproduces it and the definition behind it.</p></article>
+        <article><h3>Benchmark runner</h3><p>Conditions × models × artifacts × seeds, stored in SQLite, with bootstrap intervals on every rate.</p></article>
+        <article><h3>Web app and API</h3><p>Trajectory lab, fact-check playground, run manager and results dashboard, all backed by a documented REST API.</p></article>
+        <article><h3>Model adapters</h3><p>An Anthropic adapter today; a small interface for any other provider. Refusals are recorded, never hidden.</p></article>
+      </div>
+    </section>
+
+    <section id="results" class="wrap">
+      <h2>Findings</h2>
+      <div class="note"><b>Experiments with real models have not been run yet.</b> The figures below are placeholders that will be replaced by measured results. The app's demo run uses simulated explainers with hand-set error rates; it exercises the pipeline and is not evidence about any real model.</div>
+      <div class="cards three">
+        <figure class="ph"><div>PLACEHOLDER</div><figcaption><b>Figure 1.</b> Hallucination rate by condition (image, table, tool agent, QC-gated) with 95% intervals.</figcaption></figure>
+        <figure class="ph"><div>PLACEHOLDER</div><figcaption><b>Figure 2.</b> Share of explanations that misread each planted artifact, by condition.</figcaption></figure>
+        <figure class="ph"><div>PLACEHOLDER</div><figcaption><b>Figure 3.</b> Can a hidden-state probe flag unsupported MD claims? (stretch goal)</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="roadmap" class="wrap">
+      <h2>Roadmap</h2>
+      <ol class="timeline">
+        <li class="done"><b>Built</b> QC engine, ground truth, planted artifacts, verifier, evidence reports, runner, API, web app</li>
+        <li><b>Next</b> Live-API smoke test, claim-extraction validation on a hand-checked subset, two more public systems</li>
+        <li><b>Then</b> Real-model experiments, sensitivity analysis of tolerances, figures and write-up</li>
+        <li><b>Stretch</b> Hidden-state probe on claim-level labels with an open-weights model</li>
+      </ol>
+    </section>
+
+    <section class="wrap final">
+      <h2>Try it on the bundled trajectory</h2>
+      <p class="sub">Load the demo, wrap a domain across the periodic boundary, and watch the explanations go wrong.</p>
+      <div class="cta"><a class="btn btn-lg" href="/app">Open the app</a><a class="btn btn-lg btn-ghost" href="https://github.com/nishatayub/md-faith">View on GitHub</a></div>
+    </section>
+  </main>
+
+  <footer class="wrap">MD-Faith · MIT licence · Built with MDAnalysis, FastAPI and a lot of tests · <a href="https://github.com/nishatayub/md-faith">github.com/nishatayub/md-faith</a></footer>
+</body>
+</html>
