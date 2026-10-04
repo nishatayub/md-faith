@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MD-Faith poster (template)</title>
+<style>
+  @page { size: 841mm 594mm; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #0b0b0b; background: #fff; }
+  .poster { width: 841mm; height: 594mm; padding: 18mm 22mm; display: grid; grid-template-rows: auto 1fr auto; gap: 12mm; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3mm solid #2a78d6; padding-bottom: 8mm; }
+  h1 { font-size: 30mm; line-height: 1; margin: 0; letter-spacing: -.02em; }
+  h1 span { color: #2a78d6; }
+  .sub { font-size: 9mm; color: #52514e; margin-top: 4mm; max-width: 520mm; }
+  .meta { text-align: right; font-size: 6.4mm; color: #52514e; line-height: 1.5; }
+  .cols { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 10mm; }
+  section { border: .6mm solid #e1e0d9; border-radius: 4mm; padding: 7mm 8mm; background: #fcfcfb; }
+  h2 { font-size: 10mm; margin: 0 0 4mm; } p, li { font-size: 6.4mm; line-height: 1.45; } ul { padding-left: 8mm; margin: 0; }
+  .col { display: grid; gap: 8mm; align-content: start; }
+  .ph { border: .8mm dashed #7a7872; border-radius: 3mm; min-height: 80mm; display: grid; place-items: center; text-align: center; color: #7a7872; font-weight: 800; letter-spacing: .12em; padding: 6mm;
+        background: repeating-linear-gradient(45deg, transparent 0 6mm, #f1f0ec 6mm 12mm); }
+  .ph small { display: block; font-weight: 500; letter-spacing: 0; font-size: 5.4mm; margin-top: 2mm; }
+  img { width: 100%; border-radius: 2mm; border: .4mm solid #e1e0d9; }
+  .v { display: flex; gap: 4mm; align-items: baseline; margin: 2mm 0; font-size: 6.2mm; } .v b { min-width: 52mm; }
+  .s { border-left: 2mm solid; padding: 2mm 4mm; margin: 2mm 0; font-size: 6mm; border-radius: 0 2mm 2mm 0; }
+  .ok { border-color: #0ca30c; background: #e8f6e8; } .bad { border-color: #d03b3b; background: #fbeaea; }
+  .art { border-color: #ec835a; background: #fdeee6; } .uns { border-color: #fab219; background: #fff6dc; }
+  footer { display: flex; justify-content: space-between; font-size: 5.8mm; color: #52514e; }
+  .qr { width: 34mm; height: 34mm; border: .8mm dashed #7a7872; display: grid; place-items: center; font-size: 4mm; color: #7a7872; text-align: center; }
+  @media screen { body { background: #ddd; } .poster { margin: 10mm auto; background: #fff; box-shadow: 0 2mm 10mm rgba(0,0,0,.2); zoom: .32; } }
+</style>
+</head>
+<body>
+<div class="poster">
+  <header>
+    <div>
+      <h1>MD-Faith: <span>check the AI's reading of your MD run</span></h1>
+      <div class="sub">An evaluation harness that computes ground truth from trajectories, plants known processing problems and verifies every claim an LLM makes, with code rather than a second model.</div>
+    </div>
+    <div class="meta">[PLACEHOLDER: Author name]<br>[PLACEHOLDER: Affiliation / event]<br>github.com/nishatayub/md-faith</div>
+  </header>
+
+  <div class="cols">
+    <div class="col">
+      <section>
+        <h2>Why</h2>
+        <ul>
+          <li>LLMs now explain MD analyses and sound equally confident when wrong.</li>
+          <li>Numbers get read off plots; periodic-boundary artifacts get reported as conformational change; mechanisms get asserted without evidence.</li>
+          <li>No benchmark scores such explanations against trajectory-computed ground truth.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Question</h2>
+        <p>Which claims in an LLM's explanation of an MD analysis are faithful to the trajectory, and does giving the model tools rather than a picture or table reduce unfaithful claims, including when the trajectory has a processing problem?</p>
+      </section>
+      <section>
+        <h2>Verdicts</h2>
+        <div class="s ok"><b>Supported</b> matches the computed value</div>
+        <div class="s bad"><b>Contradicted</b> checkable and wrong</div>
+        <div class="s art"><b>Artifact misread</b> processing error presented as physics</div>
+        <div class="s uns"><b>Unsupported</b> mechanism without cited evidence</div>
+      </section>
+    </div>
+
+    <div class="col">
+      <section>
+        <h2>Method</h2>
+        <img src="../img/pipeline.svg" alt="MD-Faith pipeline">
+        <ul style="margin-top:4mm">
+          <li><b>Ground truth:</b> RMSD, RMSF, Rg, contacts, distance-and-angle H-bonds (cross-checked against MDAnalysis).</li>
+          <li><b>Traps:</b> wrapped domain, shuffled frames, unfitted frames.</li>
+          <li><b>Conditions:</b> image only, table only, tool agent, QC-gated agent.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Computed ground truth under planted problems</h2>
+        <img src="../figures/fig4_artifact_rmsd.png" alt="RMSD under planted artifacts">
+      </section>
+    </div>
+
+    <div class="col">
+      <section>
+        <h2>Results</h2>
+        <div class="ph">PLACEHOLDER<small>Hallucination rate by condition, 95% CI<br>(real-model run; see docs/FINDINGS_TODO.md)</small></div>
+        <div class="ph" style="margin-top:6mm">PLACEHOLDER<small>Artifact-misread share by condition</small></div>
+      </section>
+      <section>
+        <h2>Limits</h2>
+        <ul>
+          <li>[PLACEHOLDER: number of systems and models actually tested]</li>
+          <li>Extractor validity checked on [PLACEHOLDER: n] hand-labelled claims.</li>
+          <li>Artifacts are synthetic; tolerances need a sensitivity analysis.</li>
+        </ul>
+      </section>
+      <section>
+        <h2>Takeaway</h2>
+        <div class="ph" style="min-height:50mm">PLACEHOLDER<small>One sentence, written after the results exist</small></div>
+      </section>
+    </div>
+  </div>
+
+  <footer>
+    <span>Open source (MIT). Public data only. Figures stamped DEMO come from simulated explainers and are not findings.</span>
+    <div class="qr">[QR code to repository]</div>
+  </footer>
+</div>
+</body>
+</html>
