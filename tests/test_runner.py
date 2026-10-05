@@ -33,7 +33,7 @@ def test_grid_size_demo_flag_and_progress(tasks):
 
 def test_real_backend_run_is_not_flagged_demo(tasks):
     s = Store()
-    reply = '[{"id":"1","text":"t","kind":"numeric","payload":{"quantity":"rmsd_mean","value":1}}]'
+    reply = '[{"id":"1","text":"The mean backbone RMSD is 1.0 Å.","kind":"numeric","payload":{"quantity":"rmsd_mean","value":1.0}}]'
     # explanation call, then extraction call
     client = ScriptedClient(["The mean backbone RMSD is 1.0 Å.", reply])
     backend = Backend("scripted", client=client)
@@ -67,3 +67,11 @@ def test_aggregate_and_demo_story(tasks):
     assert by["qc_gated"]["artifact_misread_share"] < by["image_only"]["artifact_misread_share"]
     two = aggregate(s.per_explanation_counts(rid), by=("condition", "model"), n_boot=50)
     assert len(two) == 4 * 3
+
+
+def test_resume_skips_stored_cells(tasks):
+    s = Store()
+    first = run_experiment(s, tasks[:1], [make_backend("sim-careful")], ("table_only",), (0, 1))
+    n = s.get_run(first)["n_explanations"]
+    again = run_experiment(s, tasks[:1], [make_backend("sim-careful")], ("table_only",), (0, 1, 2), resume=first)
+    assert again == first and s.get_run(first)["n_explanations"] == n + 1

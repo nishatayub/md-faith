@@ -170,3 +170,15 @@ def test_hbond_tool(u):
 
     out = Toolbox(u).hbonds()
     assert len(out["per_frame_count"]) == len(u.trajectory) and out["persistent_pairs_over_50pct"] > 20
+
+
+def test_verify_malformed_payload_is_unverifiable():
+    from mdfaith.claims import Claim, Kind, Label
+    from mdfaith.verify import verify
+
+    c = Claim("c1", "x", Kind.NUMERIC, {"quantity": "rmsd_mean", "value": None})
+
+    class GT:
+        scalars = {"rmsd_mean": 2.0}
+
+    assert verify(c, GT()).label is Label.UNVERIFIABLE

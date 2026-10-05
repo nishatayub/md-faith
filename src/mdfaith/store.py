@@ -73,6 +73,9 @@ class Store:
             )
         return rid
 
+    def set_status(self, run_id: str, status: str) -> None:
+        self.finish_run(run_id, status)
+
     def finish_run(self, run_id: str, status: str = "done") -> None:
         with self._lock, self._db:
             self._db.execute("UPDATE runs SET status=? WHERE id=?", (status, run_id))

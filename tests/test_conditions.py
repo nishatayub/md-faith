@@ -62,7 +62,7 @@ def test_extraction_and_scoring_end_to_end(tasks):
         [
             {
                 "id": "1",
-                "text": "big change",
+                "text": "There is a big change in RMSD at frame 30.",
                 "kind": "temporal",
                 "payload": {"event": "rmsd_peak", "frame": 30, "physical": True},
             }

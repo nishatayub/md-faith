@@ -86,18 +86,33 @@ mdfaith figures --out docs/figures       # figures and tables from the latest ru
 pytest -q                                # the test suite
 ```
 
+### Running real models, for free
+
+I wanted the first real experiments to cost nothing, so MD-Faith can drive open-weights models through a local [Ollama](https://ollama.com) server. There is no key and no extra Python package, and nothing leaves my machine.
+
+```bash
+ollama pull qwen2.5:3b
+mdfaith run --models ollama:qwen2.5:3b --seeds 3 --name "qwen 3b, first pass"
+mdfaith run --models ollama:qwen2.5:3b --resume <run-id>    # continue an interrupted run, skipping stored cells
+mdfaith figures --run <run-id>                              # unstamped figures, because the run is not simulated
+```
+
+If a model has no vision support, I drop the image-only condition automatically (pass `--conditions` to override). Long runs survive timeouts and sleeping laptops: requests are retried, and a stuck claim extraction yields no claims instead of killing the run.
+
 | Task | Where |
 |---|---|
 | Fact-check a pasted explanation | App → **Fact-check**, or `POST /api/verify` |
 | Inspect ground truth and QC | App → **Trajectory lab**, or `GET /api/tasks/{id}` |
 | Run a simulated grid | App → **Runs**, or `mdfaith run --models sim-careful,sim-hasty` |
-| Run a real model | `mdfaith run --models anthropic:<model> --seeds 3` (needs credentials and spends API credit) |
+| Run a local open-weights model | `mdfaith run --models ollama:<model> --seeds 3` (free, needs a local Ollama server) |
+| Run a hosted model | `mdfaith run --models anthropic:<model> --seeds 3` (needs credentials and spends API credit) |
+| Continue an interrupted run | `mdfaith run ... --resume <run-id>` |
 
 Real-model runs are CLI-only by default. The API refuses them unless `MDFAITH_ALLOW_REAL=1`, so a hosted instance cannot spend credit by accident.
 
 ## What the demo shows, and what it doesn't
 
-**I have not run experiments with real language models yet.** Everything in the dashboards and in the figure below comes from *simulated* explainers whose error rates I set by hand to exercise the pipeline. That image-only explanations look worst and QC-gated ones best is built into those settings, so it is not a result.
+**I have not reported experiments with real language models yet.** Everything in the dashboards and in the figure below comes from *simulated* explainers whose error rates I set by hand to exercise the pipeline. That image-only explanations look worst and QC-gated ones best is built into those settings, so it is not a result.
 
 <p align="center"><img src="docs/figures/fig1_hallucination_by_condition.png" alt="Demo: hallucination rate by condition" width="620"></p>
 
@@ -112,6 +127,7 @@ The wrapped domain produces a spike that looks like dramatic motion but is a pro
 - **No LLM judges truth.** Anything checkable against a trajectory is checked by code. A language model appears only as the thing being evaluated and, optionally, as the claim extractor, which I plan to validate by hand.
 - **Simulation is labelled everywhere.** The `is_demo` flag is stored on each run and drives the UI banner and the figure stamp.
 - **No silent model fallback.** My model adapter does not switch to another model on a refusal, because that would contaminate per-model results. A refusal is recorded as a refusal.
+- **Extracted claims must be grounded.** When a model extracts claims from an explanation, I keep a claim only if the numbers in its payload literally appear in its source sentence. Small models invent values, and scoring invented claims would measure the extractor, not the explainer. Malformed payloads become *unverifiable* instead of crashing the verifier.
 - **SQLite and plain Python.** One file, easy to inspect and share, enough for this scale.
 - **A front end with no build step.** Plain ES modules and hand-written SVG charts, with all dynamic text inserted through DOM text nodes so pasted explanations cannot inject markup.
 
@@ -135,7 +151,7 @@ flowchart LR
 
 ## How I tested it
 
-- A test suite covering ground truth, artifacts, QC, the verifier, the store, the runner, the API, the web assets and the figures. RMSD and RMSF are checked against MDAnalysis's own implementations.
+- A test suite (80 tests) covering ground truth, artifacts, QC, the verifier, claim grounding, the store, the runner and resume, both model adapters, the API, the web assets and the figures. RMSD and RMSF are checked against MDAnalysis's own implementations.
 - Continuous integration on Python 3.10, 3.11 and 3.12 for every pull request.
 - A clean, non-editable install in a fresh environment to confirm the web assets ship with the package.
 - I used the web app in a browser end to end, which turned up two bugs I then fixed (a `null` rendered in the verdict panel and overlapping heatmap labels).
@@ -158,23 +174,25 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 | F10 | Landing website | Product page with honest placeholders |
 | F11 | Figures and diagrams | Figures pipeline, architecture docs, poster template, findings registry |
 | F12 | Packaging and docs | Docker, this README, changelog |
+| F13 | Local models | Ollama adapter, resumable runs, grounded claim extraction, tougher verifier |
 
 ## Limits
 
 - Simulated results are not findings. The demo error rates are invented to exercise the pipeline.
 - Only one public system (AdK) is bundled. Conclusions about other systems need more systems, including at least one that is not famous, since models may recite the literature.
 - The artifacts are synthetic, and my tolerances (10% numeric, 5-frame window, 60% residue overlap) are defaults that need a sensitivity analysis.
-- If an LLM does the claim extraction, I still have to validate it by hand on a random subset before any result is reported.
+- If an LLM does the claim extraction, I still have to validate it by hand on a random subset before any result is reported. For local runs the extractor defaults to the same model that wrote the explanation, which is convenient but means a model extracts its own claims; for any reported result I will use a separate, stronger extractor.
 - Causal statements cannot be checked from a trajectory alone, so they are reported separately as unsupported mechanisms.
-- The real-model adapter has only been tested against a fake client, not a live API.
+- Both model adapters (hosted and Ollama) have only been tested against fake transports in CI, not against a live model.
+- Small local models often loop, ignore tool schemas or skip claims, so their results mostly reflect model capability. They are a cheap way to exercise the harness, not a stand-in for frontier models.
 - The Docker image has not been built or run; the Docker daemon was not available when I wrote it.
 
 ## What's next
 
-- [ ] Smoke-test the real-model adapter against a live API
+- [ ] Smoke-test both model adapters against live models (a local Ollama model first)
 - [ ] Hand-validate claim extraction on at least 100 claims
 - [ ] Add two more public systems
-- [ ] Run real-model experiments, a tolerance sensitivity analysis, and replace the placeholder figures
+- [ ] Run the first real-model experiments, a tolerance sensitivity analysis, and replace the placeholder figures
 - [ ] Stretch: train a hidden-state probe that flags unsupported MD claims
 
 ## Licence and citing

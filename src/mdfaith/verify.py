@@ -75,6 +75,13 @@ def _causal(c: Claim) -> Verdict:
 
 
 def verify(c: Claim, gt: GroundTruth, art: ArtifactRecord | None = None) -> Verdict:
+    try:
+        return _verify(c, gt, art)
+    except (TypeError, ValueError, KeyError, AttributeError) as e:  # malformed extractor payload (null, wrong type)
+        return Verdict(c.id, Label.UNVERIFIABLE, f"malformed claim payload: {type(e).__name__}")
+
+
+def _verify(c: Claim, gt: GroundTruth, art: ArtifactRecord | None = None) -> Verdict:
     if c.kind is Kind.NUMERIC:
         return _numeric(c, gt)
     if c.kind is Kind.RANKING:

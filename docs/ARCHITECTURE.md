@@ -110,10 +110,10 @@ erDiagram
 | `artifacts.py` | Planted problems with a record of exactly which frames are affected |
 | `qc.py` | Detectors that find those problems from coordinates alone |
 | `claims.py`, `verify.py` | Claim schema and programmatic verification with explicit tolerances |
-| `extract.py`, `extract_rules.py` | LLM claim extraction (real runs) and a deterministic grammar parser (offline/demo) |
+| `extract.py`, `extract_rules.py` | LLM claim extraction with a grounding filter (real runs) and a deterministic grammar parser (offline/demo) |
 | `report.py` | Sentence-level annotation with computed evidence and definitions |
 | `conditions/`, `tools.py`, `render.py` | What the model is shown: plots, tables, or analysis tools |
-| `simulated.py`, `llm_anthropic.py`, `llm.py` | Explainers: labelled simulations and a real adapter behind one interface |
+| `simulated.py`, `llm_anthropic.py`, `llm_ollama.py`, `llm.py` | Explainers: labelled simulations, a hosted-model adapter and a local Ollama adapter behind one interface |
 | `runner.py`, `aggregate.py`, `metrics.py` | Experiment grid, bootstrap statistics |
 | `store.py` | SQLite persistence |
 | `api.py`, `web/` | REST API, app and landing site |

@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/).
 
+## [Unreleased]
+
+### Added
+- Ollama adapter (`ollama:<model>`) for free local open-weights models; no key or extra package needed
+- `mdfaith run --resume <run-id>` to continue interrupted runs; `--temperature`; image-only condition dropped automatically for text-only models
+- Grounded claim extraction: model-extracted claims are kept only if their numbers appear in their source sentence
+- Extractor defaults: a local extractor for local runs; `--extractor-model` to choose another
+
+### Changed
+- The verifier returns *unverifiable* for malformed claim payloads instead of raising
+- A stuck claim extraction yields no claims instead of aborting a long run; requests are retried
+
 ## [0.1.0] - 2026-10-04
 
 First research-prototype release, delivered as stacked pull requests F01-F12.
