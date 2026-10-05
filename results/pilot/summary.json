@@ -1,0 +1,43 @@
+{
+  "run_id": "ff68ec72c737",
+  "name": "qwen2.5-3b v2",
+  "model": "qwen2.5:3b (local, Ollama)",
+  "conditions": [
+    "table_only",
+    "tool_agent",
+    "qc_gated"
+  ],
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "artifacts": [
+    "none",
+    "pbc_split",
+    "shuffle_frames",
+    "rigid_jitter"
+  ],
+  "extractor": "llm:qwen2.5:3b",
+  "n_explanations": 60,
+  "n_explanations_with_no_claims": 9,
+  "n_claims": 137,
+  "verdicts": {
+    "unverifiable": 28,
+    "unsupported_mechanism": 41,
+    "supported": 14,
+    "contradicted": 46,
+    "artifact_misread": 8
+  },
+  "checkable_claims": 68,
+  "overall_hallucination_rate": {
+    "value": 0.7941176470588235,
+    "ci95": [
+      0.6913534858387799,
+      0.896564401622718
+    ]
+  },
+  "is_demo": false
+}

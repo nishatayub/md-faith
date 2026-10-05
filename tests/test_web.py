@@ -29,7 +29,7 @@ def test_landing_site_is_served_at_root(client):
 
 def test_landing_site_labels_results_as_placeholders():
     html = (WEB / "site" / "index.html").read_text()
-    assert html.count("PLACEHOLDER") >= 3 and "have not been run yet" in html
+    assert html.count("PLACEHOLDER") >= 3 and "small pilot" in html
 
 
 def test_app_js_has_no_native_replace_children_with_nullable_args():
