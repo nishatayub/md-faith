@@ -110,9 +110,39 @@ If a model has no vision support, I drop the image-only condition automatically 
 
 Real-model runs are CLI-only by default. The API refuses them unless `MDFAITH_ALLOW_REAL=1`, so a hosted instance cannot spend credit by accident.
 
+## Pilot results (local model)
+
+I ran a first pilot with **Qwen2.5-3B**, run locally through Ollama, on the bundled AdK trajectory and its three planted-artifact variants.
+
+- **Conditions: three, not four.** Table only, tool agent and QC-gated agent. I skipped the image-only condition because this model is text-only.
+- **Explanations generated:** 60 (3 conditions × 4 trajectory variants × 5 seeds)
+- **Claims extracted and checked:** 137, of which 68 could be checked against computed ground truth
+- **Verdicts:** 14 supported, 46 contradicted, 8 artifact misread, 41 unsupported mechanism, 28 unverifiable
+- **Overall hallucination rate:** 0.79 (95% bootstrap CI 0.69 to 0.90), meaning 54 wrong or artifact-misread claims out of 68 checkable
+- Nine of the 60 explanations produced no extractable claims.
+- Full outputs, figures and tables are in [`results/pilot/`](results/pilot/).
+
+| Condition | Explanations | Claims | Hallucination rate (95% CI) | Support rate | Explanations that misread an artifact* |
+|---|---|---|---|---|---|
+| Table only | 20 | 59 | 0.68 (0.57 to 0.81) | 0.32 | 20% |
+| Tool agent | 20 | 32 | 1.00 (1.00 to 1.00) | 0.00 | 7% |
+| QC-gated agent | 20 | 46 | 0.88 (0.64 to 1.00) | 0.12 | 27% |
+
+\*Share of explanations on the three artifact variants with at least one artifact-misread claim (15 per condition).
+
+<p align="center"><img src="results/pilot/fig1_hallucination_by_condition.png" alt="Pilot: hallucination rate by condition for Qwen2.5-3B" width="620"></p>
+
+This is a small pilot on one model and one system, so treat these numbers as a first look, not a finding. Larger runs and more systems are next. Three things limit what it can say:
+
+- **The model checked itself.** The same 3B model extracted the claims from its own explanations. When I read some of the tool-agent explanations, I found it calling a tool, getting a frame-to-frame RMSD of 0.465 Å, and describing that as the "maximum RMSD", which the extractor then recorded as the trajectory's maximum and the verifier correctly marked wrong. So the tool agent's 1.00 mostly reflects quantity mix-ups and extraction noise, and I do **not** read it as "tools make explanations worse". I have not hand-validated the extracted claims.
+- **The intervals are narrow for a bad reason.** They are bootstrapped over 20 explanations per condition, and the tool agent's 1.00 has no variation to resample.
+- **A 3B model is a weak explainer.** What the pilot does show is that the whole pipeline works end to end on a real model, and that most of what a small model claims about a trajectory does not survive checking.
+
+The next step is to re-run this with a separate, stronger extractor and to hand-check a sample of the claims before drawing any conclusion about conditions.
+
 ## What the demo shows, and what it doesn't
 
-**I have not reported experiments with real language models yet.** Everything in the dashboards and in the figure below comes from *simulated* explainers whose error rates I set by hand to exercise the pipeline. That image-only explanations look worst and QC-gated ones best is built into those settings, so it is not a result.
+**Apart from the small pilot above, I have not run real-model experiments.** Everything in the dashboards and in the figure below comes from *simulated* explainers whose error rates I set by hand to exercise the pipeline. That image-only explanations look worst and QC-gated ones best is built into those settings, so it is not a result.
 
 <p align="center"><img src="docs/figures/fig1_hallucination_by_condition.png" alt="Demo: hallucination rate by condition" width="620"></p>
 
@@ -175,6 +205,7 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 | F11 | Figures and diagrams | Figures pipeline, architecture docs, poster template, findings registry |
 | F12 | Packaging and docs | Docker, this README, changelog |
 | F13 | Local models | Ollama adapter, resumable runs, grounded claim extraction, tougher verifier |
+| F14 | Pilot results | First real-model pilot (Qwen2.5-3B), exported outputs, README section |
 
 ## Limits
 
@@ -183,16 +214,17 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 - The artifacts are synthetic, and my tolerances (10% numeric, 5-frame window, 60% residue overlap) are defaults that need a sensitivity analysis.
 - If an LLM does the claim extraction, I still have to validate it by hand on a random subset before any result is reported. For local runs the extractor defaults to the same model that wrote the explanation, which is convenient but means a model extracts its own claims; for any reported result I will use a separate, stronger extractor.
 - Causal statements cannot be checked from a trajectory alone, so they are reported separately as unsupported mechanisms.
-- Both model adapters (hosted and Ollama) have only been tested against fake transports in CI, not against a live model.
+- The Ollama adapter ran the pilot live, but CI only tests it (and the hosted-model adapter) against fake transports. The hosted-model adapter has never been run against a live API.
 - Small local models often loop, ignore tool schemas or skip claims, so their results mostly reflect model capability. They are a cheap way to exercise the harness, not a stand-in for frontier models.
 - The Docker image has not been built or run; the Docker daemon was not available when I wrote it.
 
 ## What's next
 
-- [ ] Smoke-test both model adapters against live models (a local Ollama model first)
-- [ ] Hand-validate claim extraction on at least 100 claims
+- [ ] Smoke-test the hosted-model adapter against a live API
 - [ ] Add two more public systems
-- [ ] Run the first real-model experiments, a tolerance sensitivity analysis, and replace the placeholder figures
+- [ ] Re-run the pilot with a separate, stronger extractor and hand-check at least 100 claims
+- [ ] Add the image-only condition with a vision model
+- [ ] Run larger experiments on more systems, a tolerance sensitivity analysis, and replace the placeholder figures
 - [ ] Stretch: train a hidden-state probe that flags unsupported MD claims
 
 ## Licence and citing

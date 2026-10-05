@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Results
+- First real-model pilot: Qwen2.5-3B (local), 60 explanations, 137 claims; outputs in `results/pilot/`. Small and self-extracted, so a first look rather than a finding
+
 ### Added
 - Ollama adapter (`ollama:<model>`) for free local open-weights models; no key or extra package needed
 - `mdfaith run --resume <run-id>` to continue interrupted runs; `--temperature`; image-only condition dropped automatically for text-only models
