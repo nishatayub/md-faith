@@ -56,26 +56,44 @@ def cmd_run(a) -> None:
     from .artifacts import DEFAULT_SPECS
     from .extract import LLMExtractor
     from .pipeline import build_tasks
-    from .runner import make_backend, run_experiment
+    from .runner import make_backend, run_experiment, supports_images
     from .store import Store
 
-    backends = [make_backend(m) for m in a.models.split(",")]
+    specs = a.models.split(",")
+    backends = [make_backend(m, temperature=a.temperature) for m in specs]
+    conditions = a.conditions.split(",") if a.conditions else ["image_only", "table_only", "tool_agent", "qc_gated"]
+    if not a.conditions and not all(supports_images(m) for m in specs):
+        conditions.remove("image_only")
+        print("note: dropping image_only (a model in --models has no vision support); pass --conditions to override")
     extractor = None
     if any(not b.is_simulated for b in backends):
-        from .llm_anthropic import AnthropicClient
+        spec = a.extractor_model
+        if spec is None:  # default: free local extractor when only local models are run, else Claude
+            spec = "claude-opus-5-5" if any(b.name.startswith("anthropic:") for b in backends) else None
+            spec = spec or next(b.name for b in backends if not b.is_simulated)
+        if spec.startswith("ollama:"):
+            from .llm_ollama import OllamaClient
 
-        extractor = LLMExtractor(AnthropicClient(model=a.extractor_model))
+            client = OllamaClient(
+                model=spec.split(":", 1)[1], temperature=0.0, max_tokens=1200
+            )  # extractor must be deterministic
+        else:
+            from .llm_anthropic import AnthropicClient
+
+            client = AnthropicClient(model=spec.removeprefix("anthropic:"))
+        extractor = LLMExtractor(client)
     tasks = build_tasks(a.system, [DEFAULT_SPECS[k] for k in a.artifacts.split(",")])
     store = Store(a.db)
     rid = run_experiment(
         store,
         tasks,
         backends,
-        a.conditions.split(","),
+        conditions,
         range(a.seeds),
         extractor=extractor,
         name=a.name,
         progress=lambda d, t: print(f"\r{d}/{t}", end="", flush=True),
+        resume=a.resume,
     )
     print(f"\nrun {rid} stored in {a.db}")
 
@@ -150,13 +168,27 @@ def main(argv=None) -> None:
     d.add_argument("--seeds", type=int, default=8)
     d.set_defaults(fn=cmd_demo)
     r = sub.add_parser("run", help="run an experiment grid (simulated or real models)")
-    r.add_argument("--models", default="sim-careful,sim-hasty,sim-confident", help="sim-<persona> | anthropic:<model>")
-    r.add_argument("--conditions", default="image_only,table_only,tool_agent,qc_gated")
+    r.add_argument(
+        "--models",
+        default="sim-careful,sim-hasty,sim-confident",
+        help="sim-<persona> | anthropic:<model> | ollama:<model>",
+    )
+    r.add_argument(
+        "--conditions", default=None, help="comma list (default: all four; image_only dropped for text-only models)"
+    )
+    r.add_argument(
+        "--temperature", type=float, default=None, help="sampling temperature for Ollama explainers (default 0.7)"
+    )
     r.add_argument("--artifacts", default="none,pbc_split,shuffle_frames,rigid_jitter")
     r.add_argument("--system", default="adk_dims")
     r.add_argument("--seeds", type=int, default=3)
-    r.add_argument("--extractor-model", default="claude-opus-5-5")
+    r.add_argument(
+        "--extractor-model",
+        default=None,
+        help="claim extractor: ollama:<model> | anthropic:<model> (default: see docs)",
+    )
     r.add_argument("--name", default="cli run")
+    r.add_argument("--resume", default=None, help="run id to continue, skipping cells already stored")
     r.add_argument("--db", default="results/mdfaith.db")
     r.set_defaults(fn=cmd_run)
     sv = sub.add_parser("serve", help="start the web app and API")
