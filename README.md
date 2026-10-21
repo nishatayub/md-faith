@@ -133,6 +133,16 @@ I ran a first pilot with **Qwen2.5-3B**, run locally through Ollama, on the bund
 
 <p align="center"><img src="results/pilot/fig1_hallucination_by_condition.png" alt="Pilot: hallucination rate by condition for Qwen2.5-3B" width="620"></p>
 
+### Do the results depend on my tolerances?
+
+My verifier has tolerances I chose: a stated value must be within 10% of the computed one, a stated frame within 5 frames, and at least 60% of claimed residues must be in the computed top-k. I re-verified the pilot's stored claims while varying each one on its own (`mdfaith sensitivity`, results in [`results/pilot/sensitivity.csv`](results/pilot/sensitivity.csv)).
+
+<p align="center"><img src="results/pilot/fig5_tolerance_sensitivity.png" alt="Pilot: sensitivity of the hallucination rate to each tolerance" width="860"></p>
+
+- **Only the numeric tolerance matters.** Moving it from 2% to 50% takes the overall rate from 0.85 to 0.59 (0.81 at my 10% default). The frame window and the two ranking parameters move it by 0.03 or less.
+- **The headline survives.** Even if I accept any stated value within 50% of the truth, more than half of the checkable claims are still wrong. "Most of what this model claims does not hold up" does not depend on my choice.
+- **Some orderings between conditions do not survive.** Table only stays the lowest at every tolerance, but the tool agent and the QC-gated agent swap places somewhere between a 20% and a 30% numeric tolerance. I would not report that ordering.
+
 This is a small pilot on one model and one system, so treat these numbers as a first look, not a finding. Larger runs and more systems are next. Three things limit what it can say:
 
 - **The model checked itself.** The same 3B model extracted the claims from its own explanations. When I read some of the tool-agent explanations, I found it calling a tool, getting a frame-to-frame RMSD of 0.465 Å, and describing that as the "maximum RMSD", which the extractor then recorded as the trajectory's maximum and the verifier correctly marked wrong. So the tool agent's 1.00 mostly reflects quantity mix-ups and extraction noise, and I do **not** read it as "tools make explanations worse". I have not hand-validated the extracted claims.

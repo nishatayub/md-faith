@@ -217,3 +217,38 @@ def make_figures(store: Store, run_id: str, out_dir: str | Path, with_trajectory
         paths.append(fig_artifact_rmsd(out))
     write_tables(by_cond, by_ca, out)
     return paths
+
+
+def fig_sensitivity(rows, out: Path, is_demo: bool = False):
+    """Hallucination rate as each tolerance is varied (others at default), one panel per tolerance, one line per condition."""
+    from .sensitivity import GRID as TOL_GRID
+    from .sensitivity import LABELS
+
+    conds = [c for c in COND if any(r["condition"] == c for r in rows)]
+    fig, axes = plt.subplots(1, 4, figsize=(13, 3.2), sharey=True)
+    for ax, param in zip(axes, TOL_GRID, strict=True):
+        for c in conds:
+            pts = sorted(
+                (r["value"], r["hallucination_rate"]) for r in rows if r["parameter"] == param and r["condition"] == c
+            )
+            ax.plot(
+                [p[0] for p in pts], [p[1] for p in pts], marker="o", ms=4, lw=1.8, color=COLORS[c], label=COND_LABEL[c]
+            )
+        dflt = next(r["value"] for r in rows if r["parameter"] == param and r["is_default"])
+        ax.axvline(dflt, color=GRID, lw=1.2, ls="--")
+        ax.set_title(LABELS[param], fontsize=9.5, loc="left", fontweight="bold")
+        ax.yaxis.grid(True, color=GRID)
+        ax.set_axisbelow(True)
+        ax.set_ylim(0, 1.02)
+    axes[0].set_ylabel("hallucination rate")
+    axes[0].legend(fontsize=8, frameon=False, loc="lower left")
+    fig.suptitle(
+        "How much do the results depend on my tolerances? (dashed line = default)",
+        x=0.01,
+        ha="left",
+        fontsize=11.5,
+        fontweight="bold",
+        y=1.06,
+    )
+    _stamp(fig, is_demo)
+    return _save(fig, out / "fig5_tolerance_sensitivity.png")
