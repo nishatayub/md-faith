@@ -19,7 +19,10 @@ def test_health_and_meta(client):
 
 
 def test_tasks_and_detail_with_qc(client):
-    assert len(client.get("/api/tasks").json()) == 4
+    from mdfaith.data import available_systems
+
+    tasks = client.get("/api/tasks").json()
+    assert len(tasks) == 4 * len(available_systems()) and {t["system"] for t in tasks} == set(available_systems())
     d = client.get("/api/tasks/adk_dims:pbc_split").json()
     assert len(d["rmsd"]) == d["n_frames"] == 98 and d["artifact"]["frames"] == [30, 31, 32]
     assert d["qc"]["passed"] is False and "broken_backbone" in [f["code"] for f in d["qc"]["flags"]]

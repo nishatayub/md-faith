@@ -210,12 +210,12 @@ async function runs() {
       el("fieldset", { class: "fieldset" }, el("legend", {}, "Conditions"), meta.conditions.map((c) => el("label", { class: "check", title: c.description }, el("input", { type: "checkbox", name: "cond", value: c.name, checked: true }), COND_LABEL[c.name])))),
     el("div", { class: "grid cols-2" },
       el("fieldset", { class: "fieldset" }, el("legend", {}, "Trajectory variants"), meta.artifacts.map((a) => el("label", { class: "check", title: a.description }, el("input", { type: "checkbox", name: "art", value: a.kind, checked: true }), ART_LABEL[a.kind]))),
-      el("div", {}, el("label", { for: "seeds" }, "Seeds (replicates)"), el("input", { type: "number", id: "seeds", min: 1, max: 20, value: 4 }), el("label", { for: "rname", style: "margin-top:10px" }, "Name"), el("input", { type: "text", id: "rname", value: "web run", maxlength: 120 }))),
+      el("div", {}, meta.systems.length > 1 ? [el("label", { for: "system" }, "Trajectory system"), el("select", { id: "system" }, meta.systems.map((x) => el("option", { value: x.name, title: x.description }, x.name))), el("div", { style: "height:10px" })] : null, el("label", { for: "seeds" }, "Seeds (replicates)"), el("input", { type: "number", id: "seeds", min: 1, max: 20, value: 4 }), el("label", { for: "rname", style: "margin-top:10px" }, "Name"), el("input", { type: "text", id: "rname", value: "web run", maxlength: 120 }))),
     el("div", { class: "row end" }, el("button", { class: "btn", type: "submit" }, "Run")));
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const pick = (n) => [...form.querySelectorAll(`input[name=${n}]:checked`)].map((i) => i.value);
-    const body = { name: form.querySelector("#rname").value, models: pick("model"), conditions: pick("cond"), artifacts: pick("art"), seeds: +form.querySelector("#seeds").value };
+    const body = { name: form.querySelector("#rname").value, models: pick("model"), conditions: pick("cond"), artifacts: pick("art"), seeds: +form.querySelector("#seeds").value, system: form.querySelector("#system")?.value || "adk_dims" };
     if (!body.models.length || !body.conditions.length || !body.artifacts.length) return view.prepend(errorBanner(new Error("Pick at least one explainer, condition and variant.")));
     const btn = form.querySelector("button[type=submit]"); btn.disabled = true; btn.replaceChildren(spinner("Running…"));
     try { const r = await api("/runs", { body }); localStorage.lastRun = r.id; location.hash = `#/results/${r.id}`; } catch (err) { view.prepend(errorBanner(err)); btn.disabled = false; btn.textContent = "Run"; }
@@ -315,7 +315,7 @@ async function about() {
     el("section", { class: "card", style: "margin-top:16px" }, el("h3", {}, "Limits you should know"),
       el("ul", {}, [
         "Demo results use simulated explainers; their error rates are set by hand and are not findings.",
-        "One public system (AdK) so far. Conclusions about other systems need more systems.",
+        "Both systems are adenylate kinase (AdK), a famous protein that models may recite from the literature. Conclusions about other proteins need other proteins.",
         "Artifacts are synthetic. Tolerances (10% numeric, 5-frame window, 60% residue overlap) are defaults and need a sensitivity analysis.",
         "Claim extraction by an LLM must be validated by hand on a random subset before any result is reported.",
         "Causal statements are not checkable from a trajectory alone; they are reported separately as unsupported mechanisms."].map((t) => el("li", {}, t)))));

@@ -19,6 +19,9 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed (packaging)
 - The Docker image did not build on linux/arm64 (no prebuilt MDAnalysis wheel, no compiler in the slim image). It is now a multi-stage build; verified by running the container (health, app, API, non-root user, volume persistence)
 
+### Added (systems)
+- Second public system `adk_equilibrium` (AdK 1 µs run from MDAnalysisData, subsampled to 105 frames). Optional, listed only when present, downloaded only by `mdfaith fetch-data adk_equilibrium`; `mdfaith run --system a,b` runs several systems; the API and UI accept a system
+
 ### Added (tooling)
 - `mdfaith smoke --model <spec>`: three short live calls (plain, tool call, tool-result round trip) that prove a model adapter works; Ollama adapter verified live, hosted adapter run once and rejected for an invalid key
 - CI builds and smoke-tests the Docker image on every pull request

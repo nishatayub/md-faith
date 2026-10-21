@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from . import artifacts, groundtruth
+from .artifacts import DEFAULT_SPECS
 from .conditions.base import Task
 from .data import load_system
 from .extract import extract_claims
@@ -18,6 +19,19 @@ def build_tasks(system: str, artifact_specs: list) -> list:
         gt = groundtruth.compute(u, system)
         tasks.append(Task(f"{system}:{rec.kind}", system, u, gt, rec))
     return tasks
+
+
+def tasks_from_ids(task_ids: list[str]) -> dict:
+    """Build every task named by `system:artifact` ids, loading each system once. Returns {task_id: Task}."""
+    by_system: dict[str, list] = {}
+    for tid in task_ids:
+        system, kind = tid.split(":", 1)
+        by_system.setdefault(system, []).append(DEFAULT_SPECS[kind])
+    out = {}
+    for system, specs in by_system.items():
+        for t in build_tasks(system, specs):
+            out[t.task_id] = t
+    return out
 
 
 def score_explanation(task: Task, text: str, extractor_client) -> dict:
