@@ -117,14 +117,15 @@ I ran a first pilot with **Qwen2.5-3B**, run locally through Ollama, on the bund
 - **Conditions: three, not four.** Table only, tool agent and QC-gated agent. I skipped the image-only condition because this model is text-only.
 - **Explanations generated:** 60 (3 conditions × 4 trajectory variants × 5 seeds)
 - **Claims extracted and checked:** 137, of which 68 could be checked against computed ground truth
-- **Verdicts:** 14 supported, 46 contradicted, 8 artifact misread, 41 unsupported mechanism, 28 unverifiable
-- **Overall hallucination rate:** 0.79 (95% bootstrap CI 0.69 to 0.90), meaning 54 wrong or artifact-misread claims out of 68 checkable
+- **Verdicts:** 13 supported, 47 contradicted, 8 artifact misread, 41 unsupported mechanism, 28 unverifiable
+- **Overall hallucination rate:** 0.81 (95% bootstrap CI 0.71 to 0.90), meaning 55 wrong or artifact-misread claims out of 68 checkable
 - Nine of the 60 explanations produced no extractable claims.
-- Full outputs, figures and tables are in [`results/pilot/`](results/pilot/).
+- Full outputs, figures and tables are in [`results/pilot/`](results/pilot/), written by `mdfaith export`.
+- **Correction (21 Oct):** my first version of these numbers (0.79, 14 supported) was slightly wrong. A small model had emitted duplicate claim ids in 4 explanations, and my store matched verdicts to claims by id, so one claim inherited another's verdict. I fixed the pairing, added regression tests, and re-verified the stored claims without re-running the model.
 
 | Condition | Explanations | Claims | Hallucination rate (95% CI) | Support rate | Explanations that misread an artifact* |
 |---|---|---|---|---|---|
-| Table only | 20 | 59 | 0.68 (0.57 to 0.81) | 0.32 | 20% |
+| Table only | 20 | 59 | 0.71 (0.61 to 0.83) | 0.29 | 20% |
 | Tool agent | 20 | 32 | 1.00 (1.00 to 1.00) | 0.00 | 7% |
 | QC-gated agent | 20 | 46 | 0.88 (0.64 to 1.00) | 0.12 | 27% |
 

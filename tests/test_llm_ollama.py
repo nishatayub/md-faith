@@ -74,5 +74,6 @@ def test_seed_is_sent_and_extractor_drops_ungrounded_claims():
         },
     ]
     kept = extract_claims(ScriptedClient([json.dumps(items)]), "t")
-    assert [k.id for k in kept] == ["1", "4"]
+    assert [k.text for k in kept] == [items[0]["text"], items[3]["text"]]  # ungrounded claims are dropped
+    assert [k.id for k in kept] == ["c1", "c2"]  # ids are renumbered so they are unique
     assert kept[1].payload["residues"] == [12, 81]

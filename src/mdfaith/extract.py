@@ -69,7 +69,10 @@ def extract_claims(client, explanation_text: str) -> list:
         claims = claims_from_json(raw)
     except ValueError:
         return []
-    return [c for c in claims if _grounded(c)]
+    kept = [c for c in claims if _grounded(c)]
+    for i, c in enumerate(kept, 1):  # models emit duplicate or odd ids; make them unique, in order
+        c.id = f"c{i}"
+    return kept
 
 
 class LLMExtractor:
