@@ -82,7 +82,9 @@ def cmd_run(a) -> None:
 
             client = AnthropicClient(model=spec.removeprefix("anthropic:"))
         extractor = LLMExtractor(client)
-    tasks = build_tasks(a.system, [DEFAULT_SPECS[k] for k in a.artifacts.split(",")])
+    tasks = []
+    for system in a.system.split(","):
+        tasks += build_tasks(system, [DEFAULT_SPECS[k] for k in a.artifacts.split(",")])
     store = Store(a.db)
     rid = run_experiment(
         store,
@@ -146,9 +148,8 @@ def cmd_sensitivity(a) -> None:
     import csv
     import pathlib
 
-    from .artifacts import DEFAULT_SPECS
     from .figures import _style, fig_sensitivity
-    from .pipeline import build_tasks
+    from .pipeline import tasks_from_ids
     from .sensitivity import spread, sweep
     from .store import Store
 
@@ -157,9 +158,7 @@ def cmd_sensitivity(a) -> None:
     run = store.get_run(run_id) if run_id else None
     if not run:
         raise SystemExit("no such run; pass --run <id>")
-    kinds = sorted({t.split(":", 1)[1] for t in run["config"]["tasks"]})
-    system = run["config"]["tasks"][0].split(":", 1)[0]
-    tasks = {t.task_id: t for t in build_tasks(system, [DEFAULT_SPECS[k] for k in kinds])}
+    tasks = tasks_from_ids(run["config"]["tasks"])
     rows = sweep(store, run_id, tasks)
     out = pathlib.Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -208,6 +207,13 @@ def cmd_smoke(a) -> None:
     if a.model.startswith("anthropic:"):
         client.max_tokens = 1024  # keep the three calls cheap
     print(json.dumps(run_smoke(client, a.model), indent=2))
+
+
+def cmd_fetch_data(a) -> None:
+    from .data import DESCRIPTIONS, fetch_data, is_available
+
+    fetch_data(a.system)
+    print(f"{a.system}: {DESCRIPTIONS[a.system]} (available: {is_available(a.system)})")
 
 
 def cmd_selftest(a) -> None:
@@ -269,7 +275,7 @@ def main(argv=None) -> None:
         "--temperature", type=float, default=None, help="sampling temperature for Ollama explainers (default 0.7)"
     )
     r.add_argument("--artifacts", default="none,pbc_split,shuffle_frames,rigid_jitter")
-    r.add_argument("--system", default="adk_dims")
+    r.add_argument("--system", default="adk_dims", help="comma list, e.g. adk_dims,adk_equilibrium")
     r.add_argument("--seeds", type=int, default=3)
     r.add_argument(
         "--extractor-model",
@@ -319,6 +325,9 @@ def main(argv=None) -> None:
     sm = sub.add_parser("smoke", help="three short live calls proving a model adapter works")
     sm.add_argument("--model", required=True, help="anthropic:<model> | ollama:<model>")
     sm.set_defaults(fn=cmd_smoke)
+    fd = sub.add_parser("fetch-data", help="explicitly download an optional public system")
+    fd.add_argument("system", choices=["adk_equilibrium"])
+    fd.set_defaults(fn=cmd_fetch_data)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)

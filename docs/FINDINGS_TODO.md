@@ -13,7 +13,7 @@ Nothing marked **placeholder** or **demo** is a result.
 | 6 | Poster, results panel | Placeholder boxes | Same figures as above | Real-model run |
 | 7 | Methods | Claim-extractor validity: workflow and blinded sample built, **not yet labelled** | Precision / recall of the extractor on >= 100 hand-checked claims (`mdfaith validate score`) | A person labelling `results/pilot/validation/` (see `docs/VALIDATION.md`) |
 | 8 | Methods | Tolerance sensitivity | Sweep of numeric tolerance, frame window and residue overlap | Real-model run |
-| 9 | Systems | One system (AdK) | Two or more further public systems, at least one not famous (contamination check) | Choosing and downloading public data |
+| 9 | Systems | Two systems, **both AdK** (bundled transition run and a 1 us equilibrium run) | At least one non-famous protein for the contamination check (e.g. other MDAnalysisData sets); needs a short-run-compatible system with hydrogens | Choosing and approving the download |
 | 10 | API adapter | Tested with a fake SDK client only | Live smoke test of `AnthropicClient` | API credentials |
 
 Unchanged real artifact: `fig4_artifact_rmsd.png` is computed ground truth (no model involved) and can stay.

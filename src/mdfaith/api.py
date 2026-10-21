@@ -24,7 +24,7 @@ from . import __version__, artifacts
 from .aggregate import aggregate
 from .claims import Claim, Kind, Label, Verdict
 from .conditions.base import Task
-from .data import SYSTEMS, load_system
+from .data import DESCRIPTIONS, available_systems, load_system
 from .demo import seed_demo
 from .extract_rules import PATTERNS, RuleExtractor
 from .groundtruth import compute
@@ -76,6 +76,7 @@ class RunRequest(BaseModel):
     conditions: list[str] = Field(default_factory=lambda: list(ALL_CONDITIONS))
     artifacts: list[str] = Field(default_factory=lambda: list(ARTIFACT_INFO))
     seeds: int = Field(4, ge=1, le=20)
+    system: str = "adk_dims"
 
 
 class DemoRequest(BaseModel):
@@ -97,7 +98,7 @@ class TaskCache:
                 system, kind = task_id.split(":", 1)
             except ValueError:
                 raise HTTPException(404, f"bad task id {task_id!r}") from None
-            if system not in SYSTEMS or kind not in artifacts.DEFAULT_SPECS:
+            if system not in available_systems() or kind not in artifacts.DEFAULT_SPECS:
                 raise HTTPException(404, f"unknown task {task_id!r}")
             base = self._bases.setdefault(system, load_system(system))
             u, rec = artifacts.build_default(base, kind)
@@ -173,7 +174,7 @@ def create_app(db_path: str = "results/mdfaith.db", web_dir: str | Path | None =
     def meta():
         return {
             "version": __version__,
-            "systems": sorted(SYSTEMS),
+            "systems": [{"name": n, "description": DESCRIPTIONS[n]} for n in available_systems()],
             "artifacts": [{"kind": k, "description": v} for k, v in ARTIFACT_INFO.items()],
             "conditions": [{"name": k, "description": v} for k, v in CONDITION_INFO.items()],
             "simulated_models": [{"name": p.name, "description": p.description} for p in PERSONAS.values()],
@@ -193,7 +194,7 @@ def create_app(db_path: str = "results/mdfaith.db", web_dir: str | Path | None =
                 "artifact": k,
                 "description": ARTIFACT_INFO[k],
             }
-            for s in sorted(SYSTEMS)
+            for s in available_systems()
             for k in ARTIFACT_INFO
         ]
 
@@ -263,7 +264,9 @@ def create_app(db_path: str = "results/mdfaith.db", web_dir: str | Path | None =
             raise HTTPException(422, str(e)) from None
         if not set(req.conditions) <= set(ALL_CONDITIONS) or not set(req.artifacts) <= set(ARTIFACT_INFO):
             raise HTTPException(422, "unknown condition or artifact")
-        tasks_ = [cache.get(f"adk_dims:{a}") for a in req.artifacts]
+        if req.system not in available_systems():
+            raise HTTPException(422, f"system {req.system!r} is not available on this server")
+        tasks_ = [cache.get(f"{req.system}:{a}") for a in req.artifacts]
         rid = run_experiment(store, tasks_, backends, req.conditions, range(req.seeds), name=req.name)
         return store.get_run(rid)
 

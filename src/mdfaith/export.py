@@ -12,10 +12,9 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from .artifacts import DEFAULT_SPECS
 from .claims import Claim, Kind
 from .metrics import cluster_bootstrap, hallucination_rate
-from .pipeline import build_tasks
+from .pipeline import tasks_from_ids
 from .store import Store
 from .verify import verify
 
@@ -26,10 +25,7 @@ def tasks_for_run(store: Store, run_id: str) -> dict:
     run = store.get_run(run_id)
     if run is None:
         raise KeyError(f"unknown run {run_id!r}")
-    ids = run["config"]["tasks"]
-    system = ids[0].split(":", 1)[0]
-    kinds = sorted({t.split(":", 1)[1] for t in ids})
-    return {t.task_id: t for t in build_tasks(system, [DEFAULT_SPECS[k] for k in kinds])}
+    return tasks_from_ids(run["config"]["tasks"])
 
 
 def reverify_run(store: Store, run_id: str, tasks: dict | None = None) -> dict:

@@ -84,6 +84,18 @@ docker compose up --build   # http://localhost:8000
 
 I built and ran the image on Apple silicon (linux/arm64) and checked the health check, the app, the API, the non-root user and that the database survives a restart. CI builds and smoke-tests it on linux/amd64 for every pull request.
 
+### A second system
+
+The bundled trajectory is AdK in transition. For equilibrium dynamics I added the 1 µs AdK run from [MDAnalysisData](https://www.mdanalysis.org/MDAnalysisData/) (about 160 MB, subsampled to 105 frames). It is optional and is never downloaded silently:
+
+```bash
+pip install -e ".[systems]"
+mdfaith fetch-data adk_equilibrium     # the only command that downloads
+mdfaith run --system adk_dims,adk_equilibrium --models ollama:qwen2.5:3b
+```
+
+The app and API list a system only once its data is present.
+
 A few other entry points:
 
 ```bash
@@ -231,7 +243,7 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 ## Limits
 
 - Simulated results are not findings. The demo error rates are invented to exercise the pipeline.
-- Only one public system (AdK) is bundled. Conclusions about other systems need more systems, including at least one that is not famous, since models may recite the literature.
+- I now have two systems, but **both are adenylate kinase** (the bundled transition run and a 1 µs equilibrium run), and AdK is famous enough that a model may recite the literature instead of reading the data. Conclusions about other proteins need other proteins; `MDAnalysisData` has less famous ones that I could add next.
 - The artifacts are synthetic, and my tolerances (10% numeric, 5-frame window, 60% residue overlap) are defaults that need a sensitivity analysis.
 - If an LLM does the claim extraction, I still have to validate it by hand on a random subset before any result is reported. For local runs the extractor defaults to the same model that wrote the explanation, which is convenient but means a model extracts its own claims; for any reported result I will use a separate, stronger extractor.
 - Causal statements cannot be checked from a trajectory alone, so they are reported separately as unsupported mechanisms.
