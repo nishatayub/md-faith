@@ -20,6 +20,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - The Docker image did not build on linux/arm64 (no prebuilt MDAnalysis wheel, no compiler in the slim image). It is now a multi-stage build; verified by running the container (health, app, API, non-root user, volume persistence)
 
 ### Added (tooling)
+- `mdfaith smoke --model <spec>`: three short live calls (plain, tool call, tool-result round trip) that prove a model adapter works; Ollama adapter verified live, hosted adapter run once and rejected for an invalid key
 - CI builds and smoke-tests the Docker image on every pull request
 - `mdfaith validate sample|score`: blinded human validation of claim extraction (stratified sample, answer key, precision with Wilson interval, estimated recall, rate on confirmed claims); guide in `docs/VALIDATION.md`
 - `mdfaith sensitivity --run <id>` re-verifies a run's stored claims while varying each tolerance, writes `sensitivity.csv` and a figure

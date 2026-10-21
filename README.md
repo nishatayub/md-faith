@@ -235,12 +235,12 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 - The artifacts are synthetic, and my tolerances (10% numeric, 5-frame window, 60% residue overlap) are defaults that need a sensitivity analysis.
 - If an LLM does the claim extraction, I still have to validate it by hand on a random subset before any result is reported. For local runs the extractor defaults to the same model that wrote the explanation, which is convenient but means a model extracts its own claims; for any reported result I will use a separate, stronger extractor.
 - Causal statements cannot be checked from a trajectory alone, so they are reported separately as unsupported mechanisms.
-- The Ollama adapter ran the pilot live, but CI only tests it (and the hosted-model adapter) against fake transports. The hosted-model adapter has never been run against a live API.
+- **Adapters.** The Ollama adapter has run the pilot and passes a live smoke test (`mdfaith smoke`; `results/smoke/`). The hosted-model adapter is **still unverified**: my live smoke test was rejected by the API (`401 invalid x-api-key`, so nothing was charged), and CI only tests it against a fake client. It needs a valid key to close that gap.
 - Small local models often loop, ignore tool schemas or skip claims, so their results mostly reflect model capability. They are a cheap way to exercise the harness, not a stand-in for frontier models.
 
 ## What's next
 
-- [ ] Smoke-test the hosted-model adapter against a live API
+- [ ] Smoke-test the hosted-model adapter against a live API (blocked on a valid API key; `mdfaith smoke --model anthropic:<model>` is ready)
 - [ ] Add two more public systems
 - [ ] Label the 100-claim validation sample (workflow and sample are ready), then re-run the pilot with a separate, stronger extractor
 - [ ] Add the image-only condition with a vision model
