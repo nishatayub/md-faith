@@ -11,7 +11,7 @@ Nothing marked **placeholder** or **demo** is a result.
 | 4 | README, results table | Pilot (Qwen2.5-3B, 3 conditions) plus labelled demo numbers | Larger run with a separate extractor and hand-validated claims | Stronger model access, hand annotation |
 | 5 | `docs/figures/*` (fig1-3, tables) | Stamped DEMO from simulated explainers | Regenerate with `mdfaith figures --run <real run>` | Real-model run |
 | 6 | Poster, results panel | Placeholder boxes | Same figures as above | Real-model run |
-| 7 | Methods | Claim-extractor validity | Precision / recall of the LLM extractor on >= 100 hand-checked claims | Hand annotation |
+| 7 | Methods | Claim-extractor validity: workflow and blinded sample built, **not yet labelled** | Precision / recall of the extractor on >= 100 hand-checked claims (`mdfaith validate score`) | A person labelling `results/pilot/validation/` (see `docs/VALIDATION.md`) |
 | 8 | Methods | Tolerance sensitivity | Sweep of numeric tolerance, frame window and residue overlap | Real-model run |
 | 9 | Systems | One system (AdK) | Two or more further public systems, at least one not famous (contamination check) | Choosing and downloading public data |
 | 10 | API adapter | Tested with a fake SDK client only | Live smoke test of `AnthropicClient` | API credentials |

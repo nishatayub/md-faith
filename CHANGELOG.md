@@ -17,6 +17,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Verdicts were matched to claims by claim id, so duplicate ids from a small extractor made one claim inherit another's verdict. Pairing is now positional, extracted claim ids are renumbered to be unique, and `annotate`/`align` no longer key by id. In the Qwen2.5-3B pilot this affected 1 of 137 claims (rate 0.794 to 0.809)
 
 ### Added (tooling)
+- `mdfaith validate sample|score`: blinded human validation of claim extraction (stratified sample, answer key, precision with Wilson interval, estimated recall, rate on confirmed claims); guide in `docs/VALIDATION.md`
 - `mdfaith sensitivity --run <id>` re-verifies a run's stored claims while varying each tolerance, writes `sensitivity.csv` and a figure
 - `mdfaith reverify --run <id>` recomputes stored verdicts with the current verifier, no model calls
 - `mdfaith export --run <id> --out <dir>` writes `summary.json`, `explanations.csv` and `claims.csv`

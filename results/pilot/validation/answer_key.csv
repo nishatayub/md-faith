@@ -1,0 +1,101 @@
+claim_row_id,label,detail
+175,unsupported_mechanism,causal claim with no cited computed evidence
+265,contradicted,"rmsd_max: claimed 0.465, computed 6.85, tolerance 0.685"
+264,unsupported_mechanism,causal claim with no cited computed evidence
+237,contradicted,"rmsf_max: claimed 1.32, computed 5.77, tolerance 0.577"
+187,contradicted,"rmsd_peak: claimed frame 94, computed 32, window 5"
+191,unsupported_mechanism,causal claim with no cited computed evidence
+193,artifact_misread,"claimed event at frame 26 lies in artifact frames (residues 1-60 shifted by 80.0 A along axis 0 in frames [30, 31, 32])"
+184,unsupported_mechanism,causal claim with no cited computed evidence
+214,contradicted,"rmsf_max: claimed 4, computed 5.77, tolerance 0.577"
+209,artifact_misread,"claimed event at frame 34.864 lies in artifact frames (residues 1-60 shifted by 80.0 A along axis 0 in frames [30, 31, 32])"
+281,unsupported_mechanism,causal claim with no cited computed evidence
+177,supported,"rmsd_plateau: claimed frame 60, computed 60, window 5"
+267,unverifiable,unknown quantity None or missing value
+279,contradicted,"hbond_mean_count: claimed 470, computed 111, tolerance 11.1"
+275,contradicted,"rmsd_mean: claimed 0.4, computed 4.39, tolerance 0.439"
+249,unsupported_mechanism,causal claim with no cited computed evidence
+182,contradicted,"rmsf_max: claimed 4.03, computed 10.7, tolerance 1.07"
+154,unsupported_mechanism,causal claim with no cited computed evidence
+206,unverifiable,causal claim cites evidence; needs human review
+210,unverifiable,causal claim cites evidence; needs human review
+212,unverifiable,causal claim cites evidence; needs human review
+239,contradicted,"rmsd_mean: claimed 2, computed 2.87, tolerance 0.287"
+205,contradicted,"hbond_mean_count: claimed 81, computed 110, tolerance 11"
+276,unsupported_mechanism,causal claim with no cited computed evidence
+185,contradicted,"rmsd_mean: claimed 4.03, computed 5.4, tolerance 0.54"
+274,unverifiable,causal claim cites evidence; needs human review
+233,unverifiable,causal claim cites evidence; needs human review
+270,contradicted,"rmsf_max: claimed 4, computed 5.74, tolerance 0.574"
+260,supported,"rmsd_max: claimed 6.82, computed 6.85, tolerance 0.685"
+225,unsupported_mechanism,causal claim with no cited computed evidence
+215,supported,"rmsf_max: claimed 6, computed 5.77, tolerance 0.577"
+207,unsupported_mechanism,causal claim with no cited computed evidence
+221,unsupported_mechanism,causal claim with no cited computed evidence
+159,unverifiable,causal claim cites evidence; needs human review
+277,unverifiable,causal claim cites evidence; needs human review
+196,contradicted,"rmsd_max: claimed 0.82, computed 36.1, tolerance 3.61"
+248,unverifiable,causal claim cites evidence; needs human review
+149,unsupported_mechanism,causal claim with no cited computed evidence
+258,contradicted,"1/2 claimed residues in computed top-2 [108, 6] (need 60%, window 0)"
+176,unsupported_mechanism,causal claim with no cited computed evidence
+240,contradicted,"rmsd_max: claimed 2, computed 6.7, tolerance 0.67"
+238,contradicted,"rmsf_max: claimed 0.657, computed 5.77, tolerance 0.577"
+266,unsupported_mechanism,causal claim with no cited computed evidence
+220,contradicted,"rmsd_mean: claimed 6.05, computed 2.87, tolerance 0.287"
+245,unverifiable,unknown quantity None or missing value
+180,unsupported_mechanism,causal claim with no cited computed evidence
+197,contradicted,"rmsd_max: claimed 5.97, computed 36.1, tolerance 3.61"
+224,unsupported_mechanism,causal claim with no cited computed evidence
+235,artifact_misread,time-ordered claim on a trajectory whose frame order was shuffled
+241,unverifiable,unknown quantity 'rank_autocorrelation' or missing value
+145,unverifiable,unknown quantity None or missing value
+190,contradicted,"rmsd_max: claimed 5.83, computed 36.1, tolerance 3.61"
+186,contradicted,"rmsd_mean: claimed 4.03, computed 5.4, tolerance 0.54"
+161,contradicted,"0/1 claimed residues in computed top-1 [108] (need 60%, window 0)"
+217,contradicted,"rmsd_mean: claimed 0, computed 2.87, tolerance 0.287"
+213,artifact_misread,time-ordered claim on a trajectory whose frame order was shuffled
+253,contradicted,"rmsf_max: claimed 4.44, computed 5.74, tolerance 0.574"
+165,contradicted,"rmsd_max: claimed 0.465, computed 6.85, tolerance 0.685"
+150,supported,"rmsd_max: claimed 6.83, computed 6.85, tolerance 0.685"
+155,contradicted,"rmsd_mean: claimed 6.82, computed 4.39, tolerance 0.439"
+231,artifact_misread,time-ordered claim on a trajectory whose frame order was shuffled
+223,unsupported_mechanism,causal claim with no cited computed evidence
+234,unverifiable,causal claim cites evidence; needs human review
+208,unverifiable,causal claim cites evidence; needs human review
+160,supported,"rmsd_max: claimed 6.82, computed 6.85, tolerance 0.685"
+269,contradicted,"rmsf_mean: claimed 3.94, computed 1.91, tolerance 0.191"
+272,unverifiable,causal claim cites evidence; needs human review
+251,supported,"rmsf_mean: claimed 1.79, computed 1.91, tolerance 0.191"
+204,contradicted,"hbond_mean_count: claimed 502, computed 110, tolerance 11"
+268,unverifiable,unknown quantity None or missing value
+246,unverifiable,unknown quantity None or missing value
+174,supported,"rmsd_plateau: claimed frame 60, computed 60, window 5"
+178,unsupported_mechanism,causal claim with no cited computed evidence
+181,unsupported_mechanism,causal claim with no cited computed evidence
+262,contradicted,"0/2 claimed residues in computed top-1 [149] (need 60%, window 0)"
+228,unsupported_mechanism,causal claim with no cited computed evidence
+147,unverifiable,unknown quantity None or missing value
+242,unsupported_mechanism,causal claim with no cited computed evidence
+167,unverifiable,unknown quantity None or missing value
+148,unverifiable,causal claim cites evidence; needs human review
+202,contradicted,"rmsd_mean: claimed 0.46, computed 5.4, tolerance 0.54"
+252,contradicted,"rmsf_mean: claimed 0.52, computed 1.91, tolerance 0.191"
+194,unsupported_mechanism,causal claim with no cited computed evidence
+261,contradicted,"0/1 claimed residues in computed top-1 [108] (need 60%, window 0)"
+157,supported,"rg_mean: claimed 18.3, computed 18.3, tolerance 1.83"
+222,unsupported_mechanism,causal claim with no cited computed evidence
+219,supported,"rg_std: claimed 1.02, computed 1.02, tolerance 0.102"
+183,unsupported_mechanism,causal claim with no cited computed evidence
+151,supported,"rmsf_mean: claimed 1.79, computed 1.91, tolerance 0.191"
+170,contradicted,"rmsf_max: claimed 4, computed 5.74, tolerance 0.574"
+199,unsupported_mechanism,causal claim with no cited computed evidence
+200,artifact_misread,"claimed event at frame 30 lies in artifact frames (residues 1-60 shifted by 80.0 A along axis 0 in frames [30, 31, 32])"
+259,unverifiable,causal claim cites evidence; needs human review
+158,contradicted,"1/2 claimed residues in computed top-2 [108, 6] (need 60%, window 0)"
+257,supported,"rg_mean: claimed 18.3, computed 18.3, tolerance 1.83"
+192,unsupported_mechanism,causal claim with no cited computed evidence
+255,contradicted,"rmsd_mean: claimed 6.82, computed 4.39, tolerance 0.439"
+171,contradicted,"rmsf_mean: claimed 1.5, computed 1.91, tolerance 0.191"
+162,contradicted,"0/2 claimed residues in computed top-1 [149] (need 60%, window 0)"
+166,unsupported_mechanism,causal claim with no cited computed evidence
