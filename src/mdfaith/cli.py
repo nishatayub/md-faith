@@ -195,6 +195,21 @@ def cmd_validate(a) -> None:
         )
 
 
+def cmd_smoke(a) -> None:
+    import json
+
+    from .runner import make_backend
+    from .smoke import run_smoke
+
+    b = make_backend(a.model)
+    if b.is_simulated:
+        raise SystemExit("smoke tests need a real model: anthropic:<model> or ollama:<model>")
+    client = b.client
+    if a.model.startswith("anthropic:"):
+        client.max_tokens = 1024  # keep the three calls cheap
+    print(json.dumps(run_smoke(client, a.model), indent=2))
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -301,6 +316,9 @@ def main(argv=None) -> None:
     v.add_argument("--n-explanations", type=int, default=20, help="explanations to sample for the recall check")
     v.add_argument("--seed", type=int, default=0)
     v.set_defaults(fn=cmd_validate)
+    sm = sub.add_parser("smoke", help="three short live calls proving a model adapter works")
+    sm.add_argument("--model", required=True, help="anthropic:<model> | ollama:<model>")
+    sm.set_defaults(fn=cmd_smoke)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)

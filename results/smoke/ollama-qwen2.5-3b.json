@@ -1,0 +1,25 @@
+{
+  "model": "ollama:qwen2.5:3b",
+  "passed": true,
+  "steps": [
+    {
+      "step": "plain completion",
+      "ok": true,
+      "detail": "Ready",
+      "seconds": 4.0
+    },
+    {
+      "step": "tool call",
+      "ok": true,
+      "detail": "[{\"name\": \"rmsd\", \"arguments\": {\"ref_frame\": 0}}]",
+      "seconds": 2.4
+    },
+    {
+      "step": "tool result round trip",
+      "ok": true,
+      "detail": "The backbone RMSD per frame to the reference frame (ref_frame 0) is calculated as follows: \n- Frame ",
+      "seconds": 2.4
+    }
+  ],
+  "date": "2026-10-21"
+}

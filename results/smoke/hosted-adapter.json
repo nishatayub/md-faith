@@ -1,0 +1,25 @@
+{
+  "model": "anthropic:claude-opus-5-5",
+  "passed": false,
+  "steps": [
+    {
+      "step": "plain completion",
+      "ok": false,
+      "detail": "AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': '<redacted>'}",
+      "seconds": 0.4
+    },
+    {
+      "step": "tool call",
+      "ok": false,
+      "detail": "AuthenticationError: Error code: 401 - {'type': 'error', 'error': {'type': 'authentication_error', 'message': 'invalid x-api-key'}, 'request_id': '<redacted>'}",
+      "seconds": 0.3
+    },
+    {
+      "step": "tool result round trip",
+      "ok": false,
+      "detail": "skipped: no tool call to answer",
+      "seconds": 0.0
+    }
+  ],
+  "date": "2026-10-21"
+}

@@ -18,3 +18,7 @@ dist/
 # keep the committed pilot outputs (the database itself stays local)
 !results/pilot/
 !results/pilot/**
+!results/smoke/
+!results/smoke/**
+.venv
+.venv.nosync/
