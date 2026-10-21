@@ -16,6 +16,9 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 - Verdicts were matched to claims by claim id, so duplicate ids from a small extractor made one claim inherit another's verdict. Pairing is now positional, extracted claim ids are renumbered to be unique, and `annotate`/`align` no longer key by id. In the Qwen2.5-3B pilot this affected 1 of 137 claims (rate 0.794 to 0.809)
 
+### Fixed (environment)
+- Documented a macOS pitfall that cost hours: iCloud evicting repository files made reads block forever. Keep the repo outside Desktop and Documents
+
 ### Fixed (packaging)
 - The Docker image did not build on linux/arm64 (no prebuilt MDAnalysis wheel, no compiler in the slim image). It is now a multi-stage build; verified by running the container (health, app, API, non-root user, volume persistence)
 
@@ -23,6 +26,9 @@ All notable changes to this project are documented here. The format follows [Kee
 - Second public system `adk_equilibrium` (AdK 1 µs run from MDAnalysisData, subsampled to 105 frames). Optional, listed only when present, downloaded only by `mdfaith fetch-data adk_equilibrium`; `mdfaith run --system a,b` runs several systems; the API and UI accept a system
 
 ### Added (tooling)
+- `mdfaith reextract` re-extracts and re-verifies a run's claims with a different extractor; `mdfaith compare-extractions` reports agreement between two extractions (a proxy, not validation)
+- `mdfaith import-runs --from <db>` merges runs from another database (for results produced on a cluster)
+- `scripts/hpc/` PBS and SLURM job templates plus `docs/HPC.md` (untested on the target cluster)
 - `mdfaith smoke --model <spec>`: three short live calls (plain, tool call, tool-result round trip) that prove a model adapter works; Ollama adapter verified live, hosted adapter run once and rejected for an invalid key
 - CI builds and smoke-tests the Docker image on every pull request
 - `mdfaith validate sample|score`: blinded human validation of claim extraction (stratified sample, answer key, precision with Wilson interval, estimated recall, rate on confirmed claims); guide in `docs/VALIDATION.md`

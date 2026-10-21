@@ -216,6 +216,55 @@ def cmd_fetch_data(a) -> None:
     print(f"{a.system}: {DESCRIPTIONS[a.system]} (available: {is_available(a.system)})")
 
 
+def _make_extractor(spec: str):
+    from .extract import LLMExtractor
+
+    if spec.startswith("ollama:"):
+        from .llm_ollama import OllamaClient
+
+        return LLMExtractor(OllamaClient(model=spec.split(":", 1)[1], temperature=0.0, max_tokens=1200))
+    if spec.startswith("anthropic:"):
+        from .llm_anthropic import AnthropicClient
+
+        return LLMExtractor(AnthropicClient(model=spec.split(":", 1)[1]))
+    raise SystemExit("extractor must be ollama:<model> or anthropic:<model>")
+
+
+def cmd_reextract(a) -> None:
+    from .reextract import reextract_run
+    from .store import Store
+
+    store = Store(a.db)
+    rid = reextract_run(
+        store,
+        a.run,
+        _make_extractor(a.extractor),
+        name=a.name,
+        progress=lambda d, t: print(f"\r{d}/{t}", end="", flush=True),
+    )
+    print(f"\nre-extracted run {rid} (source {a.run}, extractor {a.extractor})")
+
+
+def cmd_compare(a) -> None:
+    import json
+
+    from .reextract import compare_runs
+    from .store import Store
+
+    print(json.dumps(compare_runs(Store(a.db), a.a, a.b), indent=2))
+
+
+def cmd_import_runs(a) -> None:
+    from .store import Store
+
+    src, dst = Store(a.source), Store(a.db)
+    ids = a.run or [r["id"] for r in src.list_runs() if r["status"] == "done"]
+    for rid in ids:
+        new = dst.import_run(src, rid)
+        print(f"imported {rid} -> {new} ({src.get_run(rid)['name']})")
+    print(f"{len(ids)} run(s) imported into {a.db}")
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -328,6 +377,22 @@ def main(argv=None) -> None:
     fd = sub.add_parser("fetch-data", help="explicitly download an optional public system")
     fd.add_argument("system", choices=["adk_equilibrium"])
     fd.set_defaults(fn=cmd_fetch_data)
+    rx = sub.add_parser("reextract", help="re-extract and re-verify a run's claims with a different extractor model")
+    rx.add_argument("--db", default="results/mdfaith.db")
+    rx.add_argument("--run", required=True)
+    rx.add_argument("--extractor", required=True, help="ollama:<model> | anthropic:<model>")
+    rx.add_argument("--name", default=None)
+    rx.set_defaults(fn=cmd_reextract)
+    cp = sub.add_parser("compare-extractions", help="agreement between two extractions of the same explanations")
+    cp.add_argument("--db", default="results/mdfaith.db")
+    cp.add_argument("--a", required=True)
+    cp.add_argument("--b", required=True)
+    cp.set_defaults(fn=cmd_compare)
+    ir = sub.add_parser("import-runs", help="copy runs from another database (for example one produced on a cluster)")
+    ir.add_argument("--from", dest="source", required=True, help="source database file")
+    ir.add_argument("--db", default="results/mdfaith.db")
+    ir.add_argument("--run", action="append", help="run id to import (repeatable; default: all finished runs)")
+    ir.set_defaults(fn=cmd_import_runs)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
