@@ -76,7 +76,13 @@ mdfaith demo     # seed a clearly labelled demo run
 mdfaith serve    # website at http://127.0.0.1:8000, app at /app
 ```
 
-There is also a `Dockerfile` and `docker-compose.yml`. I have not built the image yet (see *Limits*).
+There is also a `Dockerfile` (multi-stage, non-root) and `docker-compose.yml`:
+
+```bash
+docker compose up --build   # http://localhost:8000
+```
+
+I built and ran the image on Apple silicon (linux/arm64) and checked the health check, the app, the API, the non-root user and that the database survives a restart. CI builds and smoke-tests it on linux/amd64 for every pull request.
 
 A few other entry points:
 
@@ -231,7 +237,6 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 - Causal statements cannot be checked from a trajectory alone, so they are reported separately as unsupported mechanisms.
 - The Ollama adapter ran the pilot live, but CI only tests it (and the hosted-model adapter) against fake transports. The hosted-model adapter has never been run against a live API.
 - Small local models often loop, ignore tool schemas or skip claims, so their results mostly reflect model capability. They are a cheap way to exercise the harness, not a stand-in for frontier models.
-- The Docker image has not been built or run; the Docker daemon was not available when I wrote it.
 
 ## What's next
 
