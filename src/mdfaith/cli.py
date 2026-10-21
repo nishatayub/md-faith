@@ -142,6 +142,37 @@ def cmd_export(a) -> None:
     print(json.dumps(summary, indent=2))
 
 
+def cmd_sensitivity(a) -> None:
+    import csv
+    import pathlib
+
+    from .artifacts import DEFAULT_SPECS
+    from .figures import _style, fig_sensitivity
+    from .pipeline import build_tasks
+    from .sensitivity import spread, sweep
+    from .store import Store
+
+    store = Store(a.db)
+    run_id = a.run or (store.list_runs() or [{}])[0].get("id")
+    run = store.get_run(run_id) if run_id else None
+    if not run:
+        raise SystemExit("no such run; pass --run <id>")
+    kinds = sorted({t.split(":", 1)[1] for t in run["config"]["tasks"]})
+    system = run["config"]["tasks"][0].split(":", 1)[0]
+    tasks = {t.task_id: t for t in build_tasks(system, [DEFAULT_SPECS[k] for k in kinds])}
+    rows = sweep(store, run_id, tasks)
+    out = pathlib.Path(a.out)
+    out.mkdir(parents=True, exist_ok=True)
+    with open(out / "sensitivity.csv", "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    _style()
+    print("wrote", fig_sensitivity(rows, out, is_demo=run["is_demo"]))
+    for p, v in spread(rows).items():
+        print(f"  {p:<14} overall rate {v['min']:.2f} to {v['max']:.2f} (range {v['range']:.2f})")
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -233,6 +264,12 @@ def main(argv=None) -> None:
     ex.add_argument("--run", required=True)
     ex.add_argument("--out", required=True)
     ex.set_defaults(fn=cmd_export)
+
+    sn = sub.add_parser("sensitivity", help="re-verify a run's stored claims under varied tolerances")
+    sn.add_argument("--db", default="results/mdfaith.db")
+    sn.add_argument("--run", default=None, help="run id (default: most recent)")
+    sn.add_argument("--out", default="results/sensitivity")
+    sn.set_defaults(fn=cmd_sensitivity)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
