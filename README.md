@@ -161,6 +161,12 @@ My verifier has tolerances I chose: a stated value must be within 10% of the com
 - **The headline survives.** Even if I accept any stated value within 50% of the truth, more than half of the checkable claims are still wrong. "Most of what this model claims does not hold up" does not depend on my choice.
 - **Some orderings between conditions do not survive.** Table only stays the lowest at every tolerance, but the tool agent and the QC-gated agent swap places somewhere between a 20% and a 30% numeric tolerance. I would not report that ordering.
 
+### Running bigger models on a GPU cluster
+
+My laptop (8.6 GB RAM) cannot run a 7B model, let alone the 32B models I want as a separate claim extractor, so those runs go to the IIT Delhi HPC GPUs. `scripts/hpc/` has job templates for PBS and SLURM that start Ollama on the GPU node, run one `mdfaith` command, and write to a separate database that `mdfaith import-runs` merges back. The workflow is in [`docs/HPC.md`](docs/HPC.md). **I have not run it on the cluster yet**, so it is untested there.
+
+Two commands support it: `mdfaith reextract` re-extracts claims from a run's stored explanations with a different extractor (so a stronger, separate model can replace the 3B model that currently checks itself), and `mdfaith compare-extractions` reports how often two extractors agree. Agreement is a proxy, not validation; the human check above is still required.
+
 ### Checking the extractor
 
 Because a model extracts the claims, I do not trust the pilot numbers until a person has checked a sample. I built a blinded workflow for that (`mdfaith validate`, guide in [`docs/VALIDATION.md`](docs/VALIDATION.md)): it draws a stratified random sample of 100 claims plus 20 whole explanations, hides the verdicts in a separate answer key, and scores precision with a Wilson interval, estimated recall, and the hallucination rate on confirmed claims only. **The sample for the pilot is generated (`results/pilot/validation/`) but not yet labelled, so the pilot numbers above are still unvalidated.** Glancing at the sample, I can already see extractor mistakes (a hypothetical sentence, "an RMSF analysis would give insights", recorded as a mechanism claim), which is why I will not skip this step.
@@ -254,7 +260,8 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 
 - [ ] Smoke-test the hosted-model adapter against a live API (blocked on a valid API key; `mdfaith smoke --model anthropic:<model>` is ready)
 - [ ] Add two more public systems
-- [ ] Label the 100-claim validation sample (workflow and sample are ready), then re-run the pilot with a separate, stronger extractor
+- [ ] Label the 100-claim validation sample (workflow and sample are ready)
+- [ ] On the cluster: re-extract the pilot with a separate 32B extractor, then compare the two extractions
 - [ ] Add the image-only condition with a vision model
 - [ ] Run larger experiments on more systems, a tolerance sensitivity analysis, and replace the placeholder figures
 - [ ] Stretch: train a hidden-state probe that flags unsupported MD claims

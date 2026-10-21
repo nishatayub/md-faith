@@ -160,6 +160,52 @@ class Store:
                 )
         return eid
 
+    def import_run(self, other: Store, run_id: str) -> str:
+        """Copy a run (explanations, claims and verdicts) from another database, e.g. one produced on a cluster.
+
+        Keeps the original id unless it already exists here, in which case a fresh id is used. Returns the id used.
+        """
+        src = other.get_run(run_id)
+        if src is None:
+            raise KeyError(f"unknown run {run_id!r} in the source database")
+        new_id = run_id if self.get_run(run_id) is None else uuid.uuid4().hex[:12]
+        with self._lock, self._db:
+            self._db.execute(
+                "INSERT INTO runs (id, name, created_at, is_demo, status, config_json) VALUES (?,?,?,?,?,?)",
+                (new_id, src["name"], src["created_at"], int(src["is_demo"]), src["status"], json.dumps(src["config"])),
+            )
+            for e in other.explanations(run_id, with_claims=True):
+                cur = self._db.execute(
+                    "INSERT INTO explanations (run_id, task_id, artifact_kind, condition, model, seed, text, "
+                    "n_tool_calls, n_model_calls, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)",
+                    (
+                        new_id,
+                        e["task_id"],
+                        e["artifact_kind"],
+                        e["condition"],
+                        e["model"],
+                        e["seed"],
+                        e["text"],
+                        e["n_tool_calls"],
+                        e["n_model_calls"],
+                        e["created_at"],
+                    ),
+                )
+                for c in e["claims"]:
+                    self._db.execute(
+                        "INSERT INTO claims (explanation_id, claim_id, text, kind, payload_json, label, detail) VALUES (?,?,?,?,?,?,?)",
+                        (
+                            cur.lastrowid,
+                            c["claim_id"],
+                            c["text"],
+                            c["kind"],
+                            json.dumps(c["payload"]),
+                            c["label"],
+                            c["detail"],
+                        ),
+                    )
+        return new_id
+
     def update_claim_verdict(self, claim_row_id: int, label: str, detail: str) -> None:
         with self._lock, self._db:
             self._db.execute("UPDATE claims SET label=?, detail=? WHERE id=?", (label, detail, claim_row_id))

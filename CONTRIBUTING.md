@@ -9,7 +9,11 @@ Thanks for helping. The project is small and opinionated; these rules keep it tr
 4. **Every behaviour change has a test.** Ground-truth definitions are cross-checked against MDAnalysis where possible.
 
 ## A tip for macOS
-Keep the repository outside iCloud-synced folders such as Desktop and Documents. iCloud creates duplicate files named like `name 2.py`, which can end up in commits, and syncing a virtual environment made Python start-up take minutes for me. If you must work there, name the environment `.venv.nosync` (iCloud ignores that suffix) and symlink it to `.venv`.
+Keep the repository outside iCloud-synced folders such as Desktop and Documents. Two things went wrong for me there:
+iCloud created duplicate files named like `name 2.py`, which ended up in a commit, and macOS later **evicted** about a
+hundred tracked files (including objects inside `.git`) as "dataless" files. With sync unavailable, any read of an
+evicted file blocks forever, so Python imports, `pytest` and even `git` hung with no error. You can spot it with
+`ls -lO`: the flags column shows `compressed,dataless`. A fresh clone in a normal folder such as `~/code` fixed it.
 
 ## Workflow
 ```bash

@@ -63,3 +63,20 @@ def test_persists_to_disk(tmp_path):
     s2 = Store(p)
     assert s2.get_run(rid)["n_explanations"] == 1
     s2.close()
+
+
+def test_import_run_copies_everything_and_avoids_id_clashes(tmp_path):
+    src = Store(str(tmp_path / "src.db"))
+    rid = src.create_run("from cluster", {"k": 1})
+    _add(src, rid, Label.CONTRADICTED, model="big", seed=3)
+    src.finish_run(rid)
+    dst = Store(":memory:")
+    new = dst.import_run(src, rid)
+    assert new == rid
+    (e,) = dst.explanations(new, with_claims=True)
+    assert e["model"] == "big" and e["seed"] == 3 and e["claims"][0]["label"] == "contradicted"
+    assert dst.get_run(new)["config"] == {"k": 1} and dst.get_run(new)["status"] == "done"
+    again = dst.import_run(src, rid)  # same id already present: gets a fresh one, no overwrite
+    assert again != rid and dst.get_run(again)["n_explanations"] == 1 and dst.get_run(rid)["n_explanations"] == 1
+    with pytest.raises(KeyError):
+        dst.import_run(src, "nope")
