@@ -13,6 +13,13 @@ All notable changes to this project are documented here. The format follows [Kee
 - Grounded claim extraction: model-extracted claims are kept only if their numbers appear in their source sentence
 - Extractor defaults: a local extractor for local runs; `--extractor-model` to choose another
 
+### Fixed
+- Verdicts were matched to claims by claim id, so duplicate ids from a small extractor made one claim inherit another's verdict. Pairing is now positional, extracted claim ids are renumbered to be unique, and `annotate`/`align` no longer key by id. In the Qwen2.5-3B pilot this affected 1 of 137 claims (rate 0.794 to 0.809)
+
+### Added (tooling)
+- `mdfaith reverify --run <id>` recomputes stored verdicts with the current verifier, no model calls
+- `mdfaith export --run <id> --out <dir>` writes `summary.json`, `explanations.csv` and `claims.csv`
+
 ### Changed
 - The verifier returns *unverifiable* for malformed claim payloads instead of raising
 - A stuck claim extraction yields no claims instead of aborting a long run; requests are retried

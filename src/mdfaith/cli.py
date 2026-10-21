@@ -121,6 +121,27 @@ def cmd_figures(a) -> None:
         print("wrote", p)
 
 
+def cmd_reverify(a) -> None:
+    from .export import reverify_run
+    from .store import Store
+
+    store = Store(a.db)
+    res = reverify_run(store, a.run)
+    print(f"re-verified {res['claims']} claims; {res['changed']} verdict(s) changed")
+    for c in res["changes"]:
+        print(f"  explanation {c['explanation_id']}: {c['was']} -> {c['now']}")
+
+
+def cmd_export(a) -> None:
+    import json
+
+    from .export import export_run
+    from .store import Store
+
+    summary = export_run(Store(a.db), a.run, a.out)
+    print(json.dumps(summary, indent=2))
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -203,6 +224,15 @@ def main(argv=None) -> None:
     f.add_argument("--out", default="docs/figures")
     f.add_argument("--no-trajectory", action="store_true", help="skip the trajectory-based figure")
     f.set_defaults(fn=cmd_figures)
+    rv = sub.add_parser("reverify", help="recompute stored verdicts with the current verifier (no model calls)")
+    rv.add_argument("--db", default="results/mdfaith.db")
+    rv.add_argument("--run", required=True)
+    rv.set_defaults(fn=cmd_reverify)
+    ex = sub.add_parser("export", help="write summary.json, explanations.csv and claims.csv for a run")
+    ex.add_argument("--db", default="results/mdfaith.db")
+    ex.add_argument("--run", required=True)
+    ex.add_argument("--out", required=True)
+    ex.set_defaults(fn=cmd_export)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)

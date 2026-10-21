@@ -123,7 +123,9 @@ class Store:
         n_tool_calls: int = 0,
         n_model_calls: int = 1,
     ) -> int:
-        vmap = {v.claim_id: v for v in verdicts}
+        claims, verdicts = list(claims), list(verdicts)
+        if len(claims) != len(verdicts):
+            raise ValueError("one verdict per claim is required, in claim order")
         with self._lock, self._db:
             cur = self._db.execute(
                 "INSERT INTO explanations (run_id, task_id, artifact_kind, condition, model, seed, text, "
@@ -142,8 +144,7 @@ class Store:
                 ),
             )
             eid = cur.lastrowid
-            for c in claims:
-                v = vmap.get(c.id)
+            for c, v in zip(claims, verdicts, strict=True):
                 self._db.execute(
                     "INSERT INTO claims (explanation_id, claim_id, text, kind, payload_json, label, detail) "
                     "VALUES (?,?,?,?,?,?,?)",
@@ -153,11 +154,15 @@ class Store:
                         c.text,
                         c.kind.value,
                         json.dumps(c.payload),
-                        v.label.value if v else "unverifiable",
-                        v.detail if v else "",
+                        v.label.value,
+                        v.detail,
                     ),
                 )
         return eid
+
+    def update_claim_verdict(self, claim_row_id: int, label: str, detail: str) -> None:
+        with self._lock, self._db:
+            self._db.execute("UPDATE claims SET label=?, detail=? WHERE id=?", (label, detail, claim_row_id))
 
     def explanations(self, run_id: str, with_claims: bool = False) -> list[dict]:
         with self._lock:

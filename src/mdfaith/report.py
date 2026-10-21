@@ -62,13 +62,16 @@ def _tokens(s: str) -> set:
     return set(re.findall(r"[a-z0-9]+", s.lower()))
 
 
-def align(sentences: list[str], claims: list[Claim]) -> dict:
-    """claim id -> sentence index. Uses the extractor's `_sentence` when present, else best token overlap."""
-    out = {}
+def align(sentences: list[str], claims: list[Claim]) -> list[int | None]:
+    """Sentence index for each claim, by position. Uses the extractor's `_sentence` when present, else token overlap.
+
+    Positional (not keyed by claim id) because a model-based extractor can emit duplicate ids.
+    """
+    out: list[int | None] = []
     toks = [_tokens(s) for s in sentences]
     for c in claims:
         if "_sentence" in c.payload and 0 <= int(c.payload["_sentence"]) < len(sentences):
-            out[c.id] = int(c.payload["_sentence"])
+            out.append(int(c.payload["_sentence"]))
             continue
         ct = _tokens(c.text)
         best, best_j = None, 0.0
@@ -76,8 +79,7 @@ def align(sentences: list[str], claims: list[Claim]) -> dict:
             j = len(ct & t) / max(1, len(ct | t))
             if j > best_j:
                 best, best_j = i, j
-        if best is not None and best_j >= 0.2:
-            out[c.id] = best
+        out.append(best if best is not None and best_j >= 0.2 else None)
     return out
 
 
@@ -107,12 +109,12 @@ def annotate(
     art: ArtifactRecord | None = None,
 ) -> list[AnnotatedSentence]:
     sentences = split_sentences(text)
+    if len(claims) != len(verdicts):
+        raise ValueError("annotate needs one verdict per claim, in claim order")
     amap = align(sentences, claims)
-    vmap = {v.claim_id: v for v in verdicts}
     out = [AnnotatedSentence(i, s, "unchecked") for i, s in enumerate(sentences)]
-    for c in claims:
-        i, v = amap.get(c.id), vmap.get(c.id)
-        if i is None or v is None:
+    for c, v, i in zip(claims, verdicts, amap, strict=True):
+        if i is None:
             continue
         out[i].evidence.append(_evidence(c, v, gt, art))
     for a in out:
