@@ -26,3 +26,21 @@ jobs:
           ruff format --check src tests
       - name: Test
         run: pytest -q --cov=mdfaith --cov-report=term-missing
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build image
+        run: docker build -t mdfaith:ci .
+      - name: Smoke test the container
+        run: |
+          docker run -d --name mdfaith -p 8000:8000 mdfaith:ci
+          for i in $(seq 1 40); do curl -sf http://127.0.0.1:8000/api/health && break; sleep 3; done
+          curl -sf http://127.0.0.1:8000/api/health
+          curl -sf -o /dev/null http://127.0.0.1:8000/app
+          curl -sf http://127.0.0.1:8000/api/tasks/adk_dims:pbc_split/qc | grep -q broken_backbone
+          test "$(docker exec mdfaith id -u)" != 0
+      - name: Show logs on failure
+        if: failure()
+        run: docker logs mdfaith
