@@ -143,6 +143,10 @@ My verifier has tolerances I chose: a stated value must be within 10% of the com
 - **The headline survives.** Even if I accept any stated value within 50% of the truth, more than half of the checkable claims are still wrong. "Most of what this model claims does not hold up" does not depend on my choice.
 - **Some orderings between conditions do not survive.** Table only stays the lowest at every tolerance, but the tool agent and the QC-gated agent swap places somewhere between a 20% and a 30% numeric tolerance. I would not report that ordering.
 
+### Checking the extractor
+
+Because a model extracts the claims, I do not trust the pilot numbers until a person has checked a sample. I built a blinded workflow for that (`mdfaith validate`, guide in [`docs/VALIDATION.md`](docs/VALIDATION.md)): it draws a stratified random sample of 100 claims plus 20 whole explanations, hides the verdicts in a separate answer key, and scores precision with a Wilson interval, estimated recall, and the hallucination rate on confirmed claims only. **The sample for the pilot is generated (`results/pilot/validation/`) but not yet labelled, so the pilot numbers above are still unvalidated.** Glancing at the sample, I can already see extractor mistakes (a hypothetical sentence, "an RMSF analysis would give insights", recorded as a mechanism claim), which is why I will not skip this step.
+
 This is a small pilot on one model and one system, so treat these numbers as a first look, not a finding. Larger runs and more systems are next. Three things limit what it can say:
 
 - **The model checked itself.** The same 3B model extracted the claims from its own explanations. When I read some of the tool-agent explanations, I found it calling a tool, getting a frame-to-frame RMSD of 0.465 Å, and describing that as the "maximum RMSD", which the extractor then recorded as the trajectory's maximum and the verifier correctly marked wrong. So the tool agent's 1.00 mostly reflects quantity mix-ups and extraction noise, and I do **not** read it as "tools make explanations worse". I have not hand-validated the extracted claims.
@@ -233,7 +237,7 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 
 - [ ] Smoke-test the hosted-model adapter against a live API
 - [ ] Add two more public systems
-- [ ] Re-run the pilot with a separate, stronger extractor and hand-check at least 100 claims
+- [ ] Label the 100-claim validation sample (workflow and sample are ready), then re-run the pilot with a separate, stronger extractor
 - [ ] Add the image-only condition with a vision model
 - [ ] Run larger experiments on more systems, a tolerance sensitivity analysis, and replace the placeholder figures
 - [ ] Stretch: train a hidden-state probe that flags unsupported MD claims

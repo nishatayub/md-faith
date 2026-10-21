@@ -173,6 +173,28 @@ def cmd_sensitivity(a) -> None:
         print(f"  {p:<14} overall rate {v['min']:.2f} to {v['max']:.2f} (range {v['range']:.2f})")
 
 
+def cmd_validate(a) -> None:
+    import json
+
+    from . import validation
+    from .store import Store
+
+    if a.action == "sample":
+        res = validation.make_sample(
+            Store(a.db), a.run, a.out, n_claims=a.n, n_explanations=a.n_explanations, seed=a.seed
+        )
+        print(json.dumps(res, indent=2))
+        print(f"wrote claims_to_check.csv, answer_key.csv and explanations_to_check.csv to {a.out}")
+    else:
+        d = a.out
+        print(
+            json.dumps(
+                validation.score(f"{d}/claims_to_check.csv", f"{d}/answer_key.csv", f"{d}/explanations_to_check.csv"),
+                indent=2,
+            )
+        )
+
+
 def cmd_selftest(a) -> None:
     """A fake 'agent' that misreads a planted wrapping artifact must be caught; an honest one must pass."""
     cfg = yaml.safe_load(open(a.config))
@@ -270,6 +292,15 @@ def main(argv=None) -> None:
     sn.add_argument("--run", default=None, help="run id (default: most recent)")
     sn.add_argument("--out", default="results/sensitivity")
     sn.set_defaults(fn=cmd_sensitivity)
+    v = sub.add_parser("validate", help="blinded human validation of claim extraction: sample, then score")
+    v.add_argument("action", choices=["sample", "score"])
+    v.add_argument("--db", default="results/mdfaith.db")
+    v.add_argument("--run", default=None, help="run id (sample only)")
+    v.add_argument("--out", required=True, help="directory holding the three CSV files")
+    v.add_argument("--n", type=int, default=100, help="claims to sample")
+    v.add_argument("--n-explanations", type=int, default=20, help="explanations to sample for the recall check")
+    v.add_argument("--seed", type=int, default=0)
+    v.set_defaults(fn=cmd_validate)
     s = sub.add_parser("selftest")
     s.add_argument("--config", default="configs/default.yaml")
     s.set_defaults(fn=cmd_selftest)
