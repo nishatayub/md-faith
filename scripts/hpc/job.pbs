@@ -1,6 +1,7 @@
 #!/bin/bash
 # PBS Pro template (qsub). Fill in the queue, resources and walltime for your cluster; the values below are placeholders.
-# Submit:  qsub -v ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b" scripts/hpc/job.pbs
+# Submit:  export ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b"; qsub -V scripts/hpc/job.pbs
+# (Use exported variables with -V: `qsub -v` splits on commas, and the arguments can contain commas.)
 #PBS -N mdfaith
 #PBS -q CHANGE_ME_gpu_queue
 #PBS -l select=1:ncpus=8:ngpus=1:mem=48gb
