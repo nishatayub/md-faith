@@ -31,7 +31,59 @@ results/hpc.db         <--scp--------   $MDFAITH_WORK/hpc.db
 mdfaith import-runs --from results/hpc.db
 ```
 
-## One-time setup (login node, needs internet)
+## If the login node has no internet (the IIT Delhi case)
+
+On IIT Delhi's login nodes, `git clone` and `pip` time out (no internet, no proxy set), and the system Python is 3.9 while
+MD-Faith needs 3.10 or newer. So build an **offline kit** on a machine with internet (your laptop), copy it over, and
+install from it. The scheduler there is PBS.
+
+**1. On your laptop**, choose the cluster Python minor version first. Find a module that is 3.10 or newer on the login node
+(`module avail 2>&1 | grep -i -E "anaconda|python"`, then `module load <it>` and `python3 --version`). Then:
+
+```bash
+bash scripts/hpc/make_offline_kit.sh 3.11
+```
+
+This writes `mdfaith-offline-kit/` with a snapshot of the repository, Python wheels built for linux x86_64 (the cluster is
+`x86_64`) and the Ollama server. The wheel download needs the Python version you pass to match the module you load.
+
+```bash
+rsync -avP mdfaith-offline-kit/ YOUR_LOGIN:\$SCRATCH/mdfaith-kit/
+```
+
+**2. Model weights, also from your laptop.** Pull the model locally, copy the weights, then delete them locally if disk is
+tight (Ollama stores weights by content hash, so copying the whole folder merges safely):
+
+```bash
+ollama pull qwen2.5:14b
+```
+
+```bash
+rsync -avP ~/.ollama/models/ YOUR_LOGIN:\$SCRATCH/mdfaith-work/ollama-models/
+```
+
+Sizes matter because a laptop with limited disk cannot hold a 32B model (about 20 GB). Practical choices are `qwen2.5:7b`
+(about 4.7 GB) as the explainer and `qwen2.5:14b` (about 9 GB) as a separate, larger extractor. Check the exact names
+and sizes on the [Ollama library](https://ollama.com/library). For image-only, pull one vision model the same way.
+
+**3. On the cluster login node:**
+
+```bash
+module load <the python module you chose>
+```
+
+```bash
+cd $SCRATCH/mdfaith-kit && PYTHON=python3 bash install_offline.sh
+```
+
+```bash
+cd ~/md-faith && source scripts/hpc/env.sh && ollama list
+```
+
+`ollama list` should show the models you copied. Then continue with the jobs below. If the job nodes have no GPU modules
+loaded by default, add the `module load` line your cluster uses for CUDA to the job script.
+
+## One-time setup (login node WITH internet only)
 
 ```bash
 git clone https://github.com/nishatayub/md-faith.git ~/md-faith

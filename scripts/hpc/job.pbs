@@ -2,7 +2,8 @@
 # PBS Pro template (qsub). Fill in the queue, resources and walltime for your cluster; the values below are placeholders.
 # Submit:  qsub -v ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b" scripts/hpc/job.pbs
 #PBS -N mdfaith
-#PBS -q CHANGE_ME_gpu_queue
+#PBS -q CHANGE_ME_gpu_queue      # IIT Delhi queues seen: standard, high, scai_q, debug; use the one your allocation allows
+# #PBS -P CHANGE_ME_project         # some PBS sites require a project code for accounting; uncomment if yours does
 #PBS -l select=1:ncpus=8:ngpus=1:mem=48gb
 #PBS -l walltime=06:00:00
 #PBS -j oe
