@@ -54,25 +54,33 @@ extract their claims):
 
 ```bash
 scp results/mdfaith.db cluster:$SCRATCH/mdfaith-work/seed.db
-# PBS:
-qsub -v MDFAITH_SEED_DB=$SCRATCH/mdfaith-work/seed.db,ARGS="reextract --run ff68ec72c737 --extractor ollama:qwen2.5:32b --name pilot-re-extracted-32b" scripts/hpc/job.pbs
-# SLURM:
-sbatch --export=ALL,MDFAITH_SEED_DB=$SCRATCH/mdfaith-work/seed.db,ARGS="reextract --run ff68ec72c737 --extractor ollama:qwen2.5:32b --name pilot-re-extracted-32b" scripts/hpc/job.slurm
+```
+
+Then, on the cluster, export the arguments and submit. **Use exported variables, not `qsub -v` or `sbatch --export`:**
+both of those split on commas, and the arguments contain commas.
+
+```bash
+export MDFAITH_SEED_DB=$SCRATCH/mdfaith-work/seed.db
+export ARGS="reextract --run ff68ec72c737 --extractor ollama:qwen2.5:32b --name pilot-re-extracted-32b"
+qsub -V scripts/hpc/job.pbs        # PBS
+sbatch scripts/hpc/job.slurm       # SLURM (exports the environment by default)
 ```
 
 **2. Larger runs on both systems** (the claim extractor defaults to the explainer itself for local models, so pass a
 separate one):
 
 ```bash
-ARGS="run --system adk_dims,adk_equilibrium --models ollama:qwen2.5:7b --seeds 5 --extractor-model ollama:qwen2.5:32b --name 7b-both-systems"
+export ARGS="run --system adk_dims,adk_equilibrium --models ollama:qwen2.5:7b --seeds 5 --extractor-model ollama:qwen2.5:32b --name 7b-both-systems"
 ```
+then submit as above.
 
 **3. Image-only**, once a vision model is pulled (names containing `llava`, `vl` or `vision` are treated as vision
 models and keep the image-only condition):
 
 ```bash
-ARGS="run --system adk_dims --models ollama:<vision-model> --conditions image_only --seeds 5 --extractor-model ollama:qwen2.5:32b --name vision-image-only"
+export ARGS="run --system adk_dims --models ollama:<vision-model> --conditions image_only --seeds 5 --extractor-model ollama:qwen2.5:32b --name vision-image-only"
 ```
+then submit as above.
 
 ## Bringing results back
 

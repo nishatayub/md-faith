@@ -1,6 +1,7 @@
 #!/bin/bash
 # SLURM template (sbatch). Fill in the partition, resources and time for your cluster; the values below are placeholders.
-# Submit:  sbatch --export=ALL,ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b" scripts/hpc/job.slurm
+# Submit:  export ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b"; sbatch scripts/hpc/job.slurm
+# (The environment is exported by default; `--export=ALL,ARGS=...` would split on commas.)
 #SBATCH --job-name=mdfaith
 #SBATCH --partition=CHANGE_ME_gpu_partition
 #SBATCH --gres=gpu:1
