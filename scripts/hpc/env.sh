@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Shared settings for the MD-Faith HPC scripts. Edit the three paths, then `source scripts/hpc/env.sh`.
-# UNTESTED on any specific cluster: written from the documented behaviour of Ollama and standard PBS/SLURM.
+# UNTESTED on any specific cluster: written from the documented behaviour of Ollama and standard PBS.
 
 # Where things live. Use scratch or work storage, not a small home quota: model files are many GB.
 export MDFAITH_HOME="${MDFAITH_HOME:-$HOME/md-faith}"                 # the cloned repository

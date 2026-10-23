@@ -66,9 +66,4 @@ Public systems only. Unpublished lab trajectories are not used without the data 
 Bundled test data (MDAnalysisTests) is for development; check its licence before redistributing outputs.
 
 ## Roadmap
-- **Week 1** (this scaffold done): ground truth, artifacts, claim schema, verifier, metrics, offline pipeline. To do: add
-  2 more public systems; add `HydrogenBondAnalysis`; build a provider adapter (e.g. Anthropic/OpenAI) that implements
-  `LLMClient.complete`.
-- **Week 2**: run conditions x models x artifacts x seeds; claim extraction; results tables; hand-verify subset.
-- **Week 3**: sensitivity analysis, figures, write-up; optional hidden-state probe on claim-level labels with an
-  open-weights model; optional demo page.
+See the roadmap in the [README](../README.md#whats-next); it is kept there so there is one source of truth.

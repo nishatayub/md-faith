@@ -348,7 +348,7 @@ def main(argv=None) -> None:
     f = sub.add_parser("figures", help="write figures and tables for a stored run")
     f.add_argument("--db", default="results/mdfaith.db")
     f.add_argument("--run", default=None, help="run id (default: most recent)")
-    f.add_argument("--out", default="docs/figures")
+    f.add_argument("--out", default="results/figures")
     f.add_argument("--no-trajectory", action="store_true", help="skip the trajectory-based figure")
     f.set_defaults(fn=cmd_figures)
     rv = sub.add_parser("reverify", help="recompute stored verdicts with the current verifier (no model calls)")
