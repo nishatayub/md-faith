@@ -3,8 +3,9 @@
 # Submit:  export ARGS="reextract --run <run-id> --extractor ollama:qwen2.5:32b"; qsub -V scripts/hpc/job.pbs
 # (Use exported variables with -V: `qsub -v` splits on commas, and the arguments can contain commas.)
 #PBS -N mdfaith
-#PBS -q CHANGE_ME_gpu_queue      # IIT Delhi queues seen: standard, high, scai_q, debug; use the one your allocation allows
-# #PBS -P CHANGE_ME_project         # some PBS sites require a project code for accounting; uncomment if yours does
+# IIT Delhi queues seen: standard, high, scai_q, debug. Use the one your allocation allows.
+#PBS -q CHANGE_ME_gpu_queue
+# Some PBS sites require a project code for accounting. If yours does, add a line:  #PBS -P your_project_code
 #PBS -l select=1:ncpus=8:ngpus=1:mem=48gb
 #PBS -l walltime=06:00:00
 #PBS -j oe
