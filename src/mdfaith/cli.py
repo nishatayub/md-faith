@@ -184,14 +184,18 @@ def cmd_validate(a) -> None:
         )
         print(json.dumps(res, indent=2))
         print(f"wrote claims_to_check.csv, answer_key.csv and explanations_to_check.csv to {a.out}")
+    elif a.action == "prefill":
+        print(json.dumps(validation.prefill(a.out), indent=2))
+        print("review every row: change any cell you disagree with, then run `mdfaith validate score`")
     else:
         d = a.out
-        print(
-            json.dumps(
-                validation.score(f"{d}/claims_to_check.csv", f"{d}/answer_key.csv", f"{d}/explanations_to_check.csv"),
-                indent=2,
-            )
+        res = validation.score(
+            f"{d}/claims_to_check.csv",
+            f"{d}/answer_key.csv",
+            f"{d}/explanations_to_check.csv",
+            f"{d}/claims_ai_draft.csv",
         )
+        print(json.dumps(res, indent=2))
 
 
 def cmd_smoke(a) -> None:
@@ -363,7 +367,7 @@ def main(argv=None) -> None:
     sn.add_argument("--out", default="results/sensitivity")
     sn.set_defaults(fn=cmd_sensitivity)
     v = sub.add_parser("validate", help="blinded human validation of claim extraction: sample, then score")
-    v.add_argument("action", choices=["sample", "score"])
+    v.add_argument("action", choices=["sample", "prefill", "score"])
     v.add_argument("--db", default="results/mdfaith.db")
     v.add_argument("--run", default=None, help="run id (sample only)")
     v.add_argument("--out", required=True, help="directory holding the three CSV files")

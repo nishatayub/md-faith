@@ -138,7 +138,70 @@ def _norm(v: str) -> str | None:
     return None
 
 
-def score(claims_csv: str | Path, key_csv: str | Path, explanations_csv: str | Path | None = None) -> dict:
+def prefill(out_dir: str | Path) -> dict:
+    """Copy an AI draft into the annotation files so a person can review and edit it in place.
+
+    Writes the draft label into `faithful` (and the draft count into `missed_checkable_statements`) only where the cell is
+    still blank, and puts the draft's reason in `notes` prefixed with 'AI draft:'. Never overwrites a human's entry.
+    """
+    d = Path(out_dir)
+    claims_p, ex_p = d / "claims_to_check.csv", d / "explanations_to_check.csv"
+    draft = {r["claim_row_id"]: r for r in _read(d / "claims_ai_draft.csv")}
+    rows = _read(claims_p)
+    n_claims = 0
+    for r in rows:
+        dr = draft.get(r["claim_row_id"])
+        if dr and not (r["faithful"] or "").strip():
+            r["faithful"] = dr["ai_draft_faithful"]
+            r["notes"] = f"AI draft: {dr['ai_draft_reason']}" + (f" | {r['notes']}" if r["notes"] else "")
+            n_claims += 1
+    _write(claims_p, CLAIM_COLS, rows)
+    n_ex = 0
+    if (d / "explanations_ai_draft.csv").exists():
+        edraft = {r["explanation_id"]: r for r in _read(d / "explanations_ai_draft.csv")}
+        erows = _read(ex_p)
+        for r in erows:
+            dr = edraft.get(r["explanation_id"])
+            if dr and not (r["missed_checkable_statements"] or "").strip():
+                r["missed_checkable_statements"] = dr["ai_draft_missed"]
+                r["notes"] = f"AI draft: {dr['ai_draft_reason']}" + (f" | {r['notes']}" if r["notes"] else "")
+                n_ex += 1
+        _write(ex_p, EXPL_COLS, erows)
+    return {"claims_prefilled": n_claims, "explanations_prefilled": n_ex}
+
+
+def draft_agreement(claims_csv: str | Path, draft_csv: str | Path) -> dict:
+    """How far the human's final labels moved from an AI draft: agreement, Cohen's kappa and a confusion table.
+
+    Reported next to any validation that started from a draft, because a person shown a draft tends to accept it
+    (anchoring); a very high agreement is a warning sign, not reassurance.
+    """
+    draft = {r["claim_row_id"]: _norm(r["ai_draft_faithful"]) for r in _read(draft_csv)}
+    pairs = [(draft.get(r["claim_row_id"]), _norm(r["faithful"])) for r in _read(claims_csv)]
+    pairs = [(d, h) for d, h in pairs if d is not None and h is not None]
+    n = len(pairs)
+    if n == 0:
+        return {"n": 0}
+    cats = ["yes", "partly", "no"]
+    conf = {d: {h: sum(1 for x, y in pairs if x == d and y == h) for h in cats} for d in cats}
+    agree = sum(d == h for d, h in pairs) / n
+    pe = sum((sum(1 for d, _ in pairs if d == c) / n) * (sum(1 for _, h in pairs if h == c) / n) for c in cats)
+    kappa = (agree - pe) / (1 - pe) if pe < 1 else None
+    return {
+        "n": n,
+        "agreement": agree,
+        "changed": n - round(agree * n),
+        "cohens_kappa": kappa,
+        "confusion_draft_by_human": conf,
+    }
+
+
+def score(
+    claims_csv: str | Path,
+    key_csv: str | Path,
+    explanations_csv: str | Path | None = None,
+    draft_csv: str | Path | None = None,
+) -> dict:
     """Score a filled-in annotation file against the answer key."""
     rows, key = _read(claims_csv), {r["claim_row_id"]: r for r in _read(key_csv)}
     done = [(r, _norm(r["faithful"])) for r in rows]
@@ -187,4 +250,6 @@ def score(claims_csv: str | Path, key_csv: str | Path, explanations_csv: str | P
                 "missed": missed,
                 "value": got / (got + missed) if got + missed else None,
             }
+    if draft_csv and Path(draft_csv).exists():
+        out["ai_draft_vs_final"] = draft_agreement(claims_csv, draft_csv)
     return out

@@ -26,6 +26,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - Second public system `adk_equilibrium` (AdK 1 µs run from MDAnalysisData, subsampled to 105 frames). Optional, listed only when present, downloaded only by `mdfaith fetch-data adk_equilibrium`; `mdfaith run --system a,b` runs several systems; the API and UI accept a system
 
 ### Added (tooling)
+- AI-drafted validation labels for the pilot sample (`claims_ai_draft.csv`, `explanations_ai_draft.csv`); `mdfaith validate prefill` loads a draft into the annotation files without overwriting a human; `mdfaith validate score` reports draft-vs-final agreement and Cohen's kappa
 - Offline kit for clusters whose login nodes have no internet: `scripts/hpc/make_offline_kit.sh` (laptop) and `install_offline.sh` (cluster); `docs/HPC.md` gains the offline route and PBS notes
 - `mdfaith reextract` re-extracts and re-verifies a run's claims with a different extractor; `mdfaith compare-extractions` reports agreement between two extractions (a proxy, not validation)
 - `mdfaith import-runs --from <db>` merges runs from another database (for results produced on a cluster)
