@@ -42,6 +42,32 @@ but did not (compare with `n_extracted`). A statement counts if it gives a value
 hydrogen bonds, ranks residues by flexibility, names a frame for an event, or asserts a cause or mechanism. Enter `0`
 if nothing was missed.
 
+## Starting from an AI draft (optional, to save time)
+
+To cut the labelling from about an hour to 20-30 minutes, I drafted every label myself and committed the drafts as
+separate files, **not** in the files you label:
+
+- `claims_ai_draft.csv`: my `faithful` label and a one-line reason for each of the 100 claims
+- `explanations_ai_draft.csv`: my count of missed checkable statements for each of the 20 explanations
+
+This is a screen, not validation: I am a model judging another model's extraction. Treat it as a first pass you must
+overrule wherever you disagree. The policy I used: `yes` when the record matches the sentence; `partly` when the number is
+right but the reading is imprecise (a bound recorded as equality, a subset of frames, a nearby quantity); `no` when the
+record contradicts the sentence (lowest recorded as max, RMSD recorded as RMSF, a frame-to-frame step recorded as the
+maximum RMSD) or the sentence is not a claim (hypotheticals, "data not provided", headings, generic statements).
+
+To load my draft into your files so you can edit in place:
+
+```bash
+mdfaith validate prefill --out results/pilot/validation
+```
+
+It writes my label into `faithful` (and my reason into `notes`, prefixed `AI draft:`) **only where the cell is blank**; it
+never overwrites an entry of yours. **Read every row against its sentence; do not skim.** People shown a draft tend to
+accept it (anchoring), so `mdfaith validate score` reports how many of your labels differ from mine and Cohen's kappa
+between us. A change rate near zero should make you suspicious rather than reassured. Report the result as
+"AI-drafted, human-reviewed", with that change rate.
+
 ## Scoring
 
 ```bash

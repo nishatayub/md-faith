@@ -1,0 +1,101 @@
+claim_row_id,ai_draft_faithful,ai_draft_reason
+175,no,hypothetical: says an analysis 'would' provide insight; not a claim
+265,no,frame-to-frame step recorded as the trajectory's maximum RMSD
+264,yes,interpretive summary about flexible regions
+237,partly,RMSF of residue 98 recorded as the maximum RMSF
+187,partly,'increases around frame 94' recorded as the RMSD peak
+191,no,generic statement about what H-bonds can provide; not about this trajectory
+193,partly,'sharp increase around frame 26' recorded as the peak
+184,no,"statement about lack of evidence, not a mechanism"
+214,partly,'over 4 Å' (a bound) recorded as the maximum RMSF
+209,no,frame 34.864 is not a frame number; nonsensical
+281,no,"descriptive remark about residues 105 to 106, not a mechanism"
+177,yes,plateau at frame 60 is stated
+267,no,no valid quantity recorded (None)
+279,partly,470 persistent pairs recorded as mean H-bond count per frame
+275,yes,RMSD consistently around 0.4 recorded as mean RMSD
+249,no,meta statement about the data provided
+182,no,'lowest' RMSF recorded as the maximum RMSF
+154,no,statement that attribution is not possible
+206,yes,interpretive claim about persistent H-bonds
+210,yes,interpretive summary
+212,yes,interpretive summary about flexibility
+239,partly,average over frames 1-36 recorded as the whole-trajectory mean
+205,partly,81 persistent pairs recorded as mean H-bond count per frame
+276,yes,interpretive claim about absence of flexible regions
+185,no,drop at residue 136 recorded as mean RMSD
+274,yes,interpretive claim about alignment problems
+233,yes,interpretive claim about persistent contacts
+270,partly,'over 4 Å' (a bound) recorded as the maximum RMSF
+260,yes,maximum 6.82 at frame 98 is stated
+225,no,hypothetical; says the data is not provided
+215,no,sentence says RMSD exceeds 6; recorded as RMSF
+207,no,heading fragment with no content
+221,yes,interpretive claim: no clear unfolding
+159,yes,interpretive claim about stable and flexible regions
+277,yes,hedged claim that early frames may not be equilibrated
+196,partly,maximum within frames 1-3 recorded as the trajectory maximum
+248,yes,interpretive claim about a peak in RMSF
+149,no,meta statement about the data provided
+258,partly,residues described as relatively stable recorded as lowest RMSF; values cited are RMSD
+176,yes,hedged claim about localized motions
+240,no,average over frames 1-36 recorded as the maximum RMSD
+238,partly,RMSF of one residue recorded as the maximum RMSF
+266,no,statement that data is missing
+220,no,an RMSD at frame 86 recorded as the mean RMSD
+245,no,no valid quantity recorded (None)
+180,no,says the analysis is needed; not a claim
+197,partly,'as high as 5.97 at frame 61' recorded as max RMSD; quantity only implied
+224,yes,interpretive claim about interactions
+235,partly,'increase starting from frame 97' recorded as the peak
+241,yes,rank autocorrelation -0.07 is stated; the quantity is outside the checkable set
+145,no,no valid quantity recorded (None)
+190,partly,"'above 5.83' (a bound, with a nonsensical frame) recorded as max RMSD"
+186,no,drop at residue 136 recorded as mean RMSD
+161,yes,residue 136 described as more rigid
+217,no,lowest RMSD value recorded as mean RMSD
+213,yes,the sentence does state a peak at frame 84
+253,partly,RMSF of residue 126 recorded as the maximum RMSF
+165,no,frame-to-frame step recorded as the trajectory's maximum RMSD
+150,yes,maximum 6.83 at frame 96 is stated
+155,no,final/maximum RMSD recorded as the mean
+231,no,'stabilizes' recorded as the RMSD peak
+223,no,generic hypothetical about rigid regions
+234,yes,interpretive claim about residue pairs
+208,yes,interpretive claim about H-bond events
+160,yes,maximum 6.82 at frame 98 is stated
+269,no,RMSF of residue 56 recorded as the mean RMSF
+272,yes,interpretive claim citing the automated checks
+251,no,upper end of a range recorded as the mean RMSF
+204,partly,502 pairs recorded as mean H-bond count per frame
+268,no,no valid quantity recorded (None)
+246,no,no valid quantity recorded (None)
+174,yes,plateau at frame 60 is stated
+178,yes,interpretive claim about stability
+181,no,says more analysis would be required
+262,partly,the endpoints of a flexible region recorded as the highest RMSF residues
+228,no,generic remark about what the data focuses on
+147,no,no valid quantity recorded (None)
+242,yes,interpretive conclusion
+167,no,no valid quantity recorded (None)
+148,yes,interpretive claim about an RMSF peak
+202,yes,RMSD fluctuating around ~0.46 recorded as mean RMSD
+252,no,lower end of a range recorded as the mean RMSF
+194,yes,hedged claim about frames 25-27
+261,yes,residue 136 described as more rigid
+157,yes,Rg mean 18.27 is stated
+222,no,generic hypothetical about high-RMSF residues
+219,yes,Rg standard deviation 1.02 is stated
+183,yes,hedged claim about a change near frame 90
+151,no,upper end of a range recorded as the mean RMSF
+170,partly,'over 4 Å' (a bound) recorded as the maximum RMSF
+199,no,"descriptive remark, not a mechanism"
+200,no,frame discontinuities recorded as an RMSD plateau
+259,yes,interpretive claim about regions and events
+158,partly,residues described as relatively stable recorded as lowest RMSF; values cited are RMSD
+257,yes,Rg mean 18.27 is stated
+192,no,statement that data is not provided
+255,no,final/maximum RMSD recorded as the mean
+171,no,a threshold (below 1.5) recorded as the mean RMSF
+162,partly,the endpoints of a flexible region recorded as the highest RMSF residues
+166,no,statement that data is missing

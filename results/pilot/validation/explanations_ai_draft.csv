@@ -1,0 +1,21 @@
+explanation_id,ai_draft_missed,ai_draft_reason
+82,2,"I counted 4 checkable statements (interpretive statements about variation, no plateau, mobile segments and overall flexibility); 2 were extracted"
+81,4,"I counted 6 checkable statements (rank autocorrelation value, plateau frame 97, flexibility, stability and conclusion statements); 2 were extracted"
+51,1,I counted 4 checkable statements (late plateau at frame 60 plus three interpretive statements about stability); 3 were extracted
+87,4,"I counted 9 checkable statements (max RMSD, residue rankings (136, 46-156, 106/196), Rg mean and std, and interpretations); 5 were extracted"
+41,6,"I counted 8 checkable statements (RMSD trend, peak at frame 96, residues 1 and 6, RMSF values 4.44 and 4.41, interpretations); 2 were extracted"
+88,4,"I counted 6 checkable statements (max step 0.465, 81 of 281 persistent pairs, stability and flexibility interpretations); 2 were extracted"
+96,2,"I counted 6 checkable statements (mean RMSD 0.45, residue 23, 470 persistent pairs, contacts and interpretations); 4 were extracted"
+48,2,"I counted 3 checkable statements (stable after frame 60, early frames not equilibrated, no clear stability); 1 were extracted"
+90,4,"I counted 6 checkable statements (RMSF ranges, residues 168-174 above 2.5, 1.0 to 2.5 band, flexibility interpretation); 2 were extracted"
+59,6,"I counted 8 checkable statements (Rg jump near frame 30 (16 to 40), unfolding interpretation, RMSF pattern, summary); 2 were extracted"
+71,10,"I counted 10 checkable statements (min 0.40 at frame 68, max 6.48 at frame 90, residues 1/41/121, residues 66 and 136, 96 and 106, conclusion); 0 were extracted"
+54,4,"I counted 7 checkable statements (RMSD rise frames 94-96, over 5 Å, residues 126 and 131, drop to 4.03, interpretations); 3 were extracted"
+45,4,I counted 6 checkable statements (same content as explanation 90); 2 were extracted
+76,4,"I counted 5 checkable statements (RMSF range 0.4 to 3.6, flexibility and loop/hinge interpretations, no events); 1 were extracted"
+66,4,"I counted 9 checkable statements (mean RMSD 0.46, RMSF range, 502 pairs, 81 persistent pairs and interpretations); 5 were extracted"
+80,5,"I counted 9 checkable statements (residues 98 and 675, 0.4-0.8 band, frames 1-36 average, after frame 37, plateau and conclusions); 4 were extracted"
+49,4,"I counted 5 checkable statements (stabilizing around frame 60, gradual decrease, flexibility and no sudden jumps); 1 were extracted"
+38,3,"I counted 7 checkable statements (frames 36-40 increase, 5.8 plateau, residues 161-191, residue 126 peak, interpretations); 4 were extracted"
+68,8,"I counted 10 checkable statements (frame RMSD values, RMSF regions and values, transitions at frames 32/34/36-38/48/86, conclusions); 2 were extracted"
+64,6,"I counted 7 checkable statements (RMSD around zero, CA-RMSF rigid, no events, constant H-bonds, contacts and summary); 1 were extracted"
