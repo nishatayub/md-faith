@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Runs ONE mdfaith command against a local Ollama server on the allocated GPU node, then shuts the server down.
-# Scheduler-agnostic body: the PBS and SLURM wrappers below call it.
+# Scheduler-agnostic body: the PBS wrapper (job.pbs) calls it.
 #
 # Usage inside a job:   bash scripts/hpc/run_job.sh <mdfaith arguments...>
 # Examples:

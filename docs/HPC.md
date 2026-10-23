@@ -4,7 +4,7 @@ My laptop has 8.6 GB of RAM, which is not enough to run a 7B model comfortably (
 hung). Everything that needs a bigger model therefore runs on the IIT Delhi HPC GPUs. This page is the recipe.
 
 > **Status: untested on IIT Delhi.** I wrote these scripts from the documented behaviour of Ollama and standard PBS and
-> SLURM, without access to the cluster. Expect to adjust queue names, resource lines and module loads. Everything marked
+> without access to the cluster. Expect to adjust queue names, resource lines and module loads. Everything marked
 > `CHANGE_ME` must be filled in. The merge step (`mdfaith import-runs`) is covered by tests.
 
 ## What needs a GPU
@@ -99,7 +99,7 @@ Check the model names against the [Ollama library](https://ollama.com/library) b
 
 ## Jobs
 
-Use the PBS or SLURM template, whichever your cluster runs, after filling in the queue, resources and walltime.
+Use the PBS template after filling in the queue, resources and walltime (a different scheduler needs its own wrapper around `run_job.sh`).
 
 **1. Re-extract the pilot with a separate, stronger extractor** (the model that wrote the explanations should not also
 extract their claims):
@@ -114,8 +114,7 @@ both of those split on commas, and the arguments contain commas.
 ```bash
 export MDFAITH_SEED_DB=$SCRATCH/mdfaith-work/seed.db
 export ARGS="reextract --run ff68ec72c737 --extractor ollama:qwen2.5:32b --name pilot-re-extracted-32b"
-qsub -V scripts/hpc/job.pbs        # PBS
-sbatch scripts/hpc/job.slurm       # SLURM (exports the environment by default)
+qsub -V scripts/hpc/job.pbs
 ```
 
 **2. Larger runs on both systems** (the claim extractor defaults to the explainer itself for local models, so pass a

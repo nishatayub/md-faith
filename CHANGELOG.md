@@ -16,6 +16,9 @@ All notable changes to this project are documented here. The format follows [Kee
 ### Fixed
 - Verdicts were matched to claims by claim id, so duplicate ids from a small extractor made one claim inherit another's verdict. Pairing is now positional, extracted claim ids are renumbered to be unique, and `annotate`/`align` no longer key by id. In the Qwen2.5-3B pilot this affected 1 of 137 claims (rate 0.794 to 0.809)
 
+### Removed
+- Unreferenced demo figures and tables from `docs/figures/` (the figures command now writes to the gitignored `results/figures/`) and the untested SLURM job template (the target cluster uses PBS)
+
 ### Fixed (environment)
 - Documented a macOS pitfall that cost hours: iCloud evicting repository files made reads block forever. Keep the repo outside Desktop and Documents
 

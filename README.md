@@ -100,7 +100,7 @@ A few other entry points:
 
 ```bash
 mdfaith qc --artifact pbc_split          # QC flags the wrapped frames
-mdfaith figures --out docs/figures       # figures and tables from the latest run
+mdfaith figures                          # figures and tables from the latest run into results/figures/
 pytest -q                                # the test suite
 ```
 
@@ -163,7 +163,7 @@ My verifier has tolerances I chose: a stated value must be within 10% of the com
 
 ### Running bigger models on a GPU cluster
 
-My laptop (8.6 GB RAM) cannot run a 7B model, let alone the 32B models I want as a separate claim extractor, so those runs go to the IIT Delhi HPC GPUs. `scripts/hpc/` has job templates for PBS and SLURM that start Ollama on the GPU node, run one `mdfaith` command, and write to a separate database that `mdfaith import-runs` merges back. The workflow is in [`docs/HPC.md`](docs/HPC.md). **I have not run it on the cluster yet**, so it is untested there.
+My laptop (8.6 GB RAM) cannot run a 7B model, let alone the 32B models I want as a separate claim extractor, so those runs go to the IIT Delhi HPC GPUs. `scripts/hpc/` has a PBS job template that starts Ollama on the GPU node, run one `mdfaith` command, and write to a separate database that `mdfaith import-runs` merges back. The workflow is in [`docs/HPC.md`](docs/HPC.md). **I have not run it on the cluster yet**, so it is untested there.
 
 Two commands support it: `mdfaith reextract` re-extracts claims from a run's stored explanations with a different extractor (so a stronger, separate model can replace the 3B model that currently checks itself), and `mdfaith compare-extractions` reports how often two extractors agree. Agreement is a proxy, not validation; the human check above is still required.
 
@@ -227,7 +227,7 @@ flowchart LR
 
 ## How I organised the work
 
-I built it as twelve features, each in its own pull request, ordered by what depends on what.
+I built it as a series of features, each in its own pull request. F01 to F12 are ordered by what depends on what; F13 onwards followed what the first real runs taught me.
 
 | # | Feature | What it adds |
 |---|---|---|
@@ -245,6 +245,17 @@ I built it as twelve features, each in its own pull request, ordered by what dep
 | F12 | Packaging and docs | Docker, this README, changelog |
 | F13 | Local models | Ollama adapter, resumable runs, grounded claim extraction, tougher verifier |
 | F14 | Pilot results | First real-model pilot (Qwen2.5-3B), exported outputs, README section |
+| F15 | Verdict pairing fix | A verdict could attach to the wrong claim; fixed, pilot numbers corrected, `reverify` and `export` added |
+| F16 | Tolerance sensitivity | How the results depend on my verifier tolerances |
+| F17 | Claim validation | Blinded human-validation workflow and the pilot sample |
+| F18 | Docker verified | Multi-stage image that builds and runs, tested in CI |
+| F19 | Adapter smoke tests | Three-call live check of a model adapter; Ollama passes |
+| F20 | Second system | AdK 1 µs equilibrium run, fetched only on request |
+| F21 | Re-extraction and HPC | `reextract`, `compare-extractions`, `import-runs`, PBS job template |
+| F22 | HPC argument fix | Job arguments were being split on commas |
+| F23 | Offline kit | Install on a cluster whose login nodes have no internet |
+| F24 | AI-drafted labels | Draft validation labels and review tooling (not validation) |
+| F25 | Cleanup | Removed unused files and stale docs |
 
 ## Limits
 
